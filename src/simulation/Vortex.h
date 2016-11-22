@@ -24,5 +24,4 @@ private:
     friend class ExplosionVisualization;
 };
 
-
 #endif //MAGISTERKA_VORTEX_H

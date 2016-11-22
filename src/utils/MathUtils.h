@@ -1,10 +1,5 @@
-//
-// Created by ubuntu on 11/19/16.
-//
-
 #ifndef MAGISTERKA_MATHUTILS_H
 #define MAGISTERKA_MATHUTILS_H
-
 
 #include <cstdlib>
 

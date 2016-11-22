@@ -4,20 +4,25 @@
 class Timer {
 public:
 
-    static Timer& getInstance() {
+    static Timer &getInstance() {
         static Timer instance;
         return instance;
     }
 
     void incrementFrame();
+
     long getCurrentTime();
+
     int getCurrentFrame();
 
 private:
 
     Timer();
-    Timer(Timer const&);
-    void operator=(Timer const&);
+
+    Timer(Timer const &);
+
+    void operator=(Timer const &);
+
     virtual ~Timer();
 
     int currentFrame;
