@@ -6,20 +6,19 @@ Config::Config(string configFileName) {
     string configFilePath = "./" + configFileName;
     ifstream file(configFilePath.c_str(), ios::in);
     if (!file.is_open()) {
-        cerr << "Nie mogę otworzyć pliku do odczytu: [" << configFilePath << "]" << std::endl;
+        Logger::getInstance().error("Nie mogę otworzyć pliku do odczytu: [%s]", configFilePath.c_str());
         exit(0);
     }
 
     string line;
-    int lineNumber = 2;
     int requiredValues = 15;
     while (getline(file, line)) {
-        Logger::getInstance().addLineToScreen(lineNumber++, ("- " + line).c_str(), 0);
+        Logger::getInstance().info(line, 0);
 
         if (line[0] == '#') {
             continue;
         }
-        vector <string> lineItems = split(line, '=');
+        vector<string> lineItems = split(line, '=');
         string key = trim(lineItems[0]);
         string value = trim(lineItems[1]);
 
@@ -39,7 +38,7 @@ Config::Config(string configFileName) {
         else if (key == "vyMedium") vyMedium = atof(value.c_str());
         else if (key == "vyFast") vyFast = atof(value.c_str());
         else {
-            cerr << "Nieznany parametr konfiguracyjny: [" << key << " = " << value << "]" << endl;
+            Logger::getInstance().error("Nieznany parametr konfiguracyjny: [%s = %s]", key.c_str(), value.c_str());
             exit(0);
         }
 
@@ -47,10 +46,9 @@ Config::Config(string configFileName) {
     }
 
     if (requiredValues != 0) {
-        cerr << "Brak parametów konfiguracyjnych w liczbie: " << requiredValues << endl;
+        Logger::getInstance().error("Brak parametów konfiguracyjnych w liczbie: %d", requiredValues);
         exit(0);
     }
-
 
     mainSourceVY = vySlow;
     int step = 0;
@@ -76,8 +74,7 @@ Config::Config(string configFileName) {
     explosionSource[step++][1] = 0.0;
     explosionSourcePhases = sizeof(explosionSource) / sizeof(explosionSource[0]);
 
-
     file.close();
 
-    cout << "Poprawnie odczytano config: [" << configFilePath << "]" << endl;
+    Logger::getInstance().info("Poprawnie odczytano config: [%s]", configFilePath.c_str());
 }
