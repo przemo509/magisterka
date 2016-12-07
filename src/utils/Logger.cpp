@@ -4,6 +4,11 @@
 #include <cstdlib>
 #include "Logger.h"
 
+extern "C"
+{
+#include "lib/snprintf/snprintf.h"
+}
+
 using namespace std;
 
 Logger::Logger() {
