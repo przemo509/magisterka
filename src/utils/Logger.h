@@ -55,6 +55,7 @@ private:
 
     virtual ~Logger();
 
+    string to_string(int i);
 };
 
 #endif //MAGISTERKA_LOGGER_H

@@ -2,6 +2,7 @@
 #include <cstdarg>
 #include <iomanip>
 #include <cstdlib>
+#include <sstream>
 #include "Logger.h"
 
 extern "C"
@@ -75,8 +76,14 @@ void Logger::debug5(string format, ...) {
 
 void Logger::debug(DebugLevel lvl, string format, va_list args) {
     if(lvl > currentLevel) {
-        log(cout, "DBG_" + to_string(lvl), format, args);
+        log(cout, "DBG_" + to_string(static_cast<int>(lvl)), format, args);
     }
+}
+
+string Logger::to_string(int i) {
+    stringstream ss;
+    ss << i;
+    return ss.str();
 }
 
 void Logger::log(ostream &stream, string level, string format, va_list args) {
