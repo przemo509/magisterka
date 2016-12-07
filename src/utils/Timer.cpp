@@ -1,3 +1,4 @@
+#include <ctime>
 #include "Timer.h"
 #include "Logger.h"
 
