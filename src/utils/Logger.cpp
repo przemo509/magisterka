@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdarg>
 #include <iomanip>
+#include <cstdlib>
 #include "Logger.h"
 
 using namespace std;
