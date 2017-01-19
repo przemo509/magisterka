@@ -3,6 +3,10 @@
 #include "../utils/MathUtils.h"
 #include "../utils/Timer.h"
 
+vect3f ExplosionSimulation::getDens() const {
+    return dens;
+}
+
 ExplosionSimulation::ExplosionSimulation() {
     N = Config::getInstance()->simulationSpaceSize;
 

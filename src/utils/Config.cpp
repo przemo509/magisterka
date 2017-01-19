@@ -3,7 +3,9 @@
 Config *Config::instance;
 
 Config::Config(string configFileName) {
-    string configFilePath = "./" + configFileName;
+    configName = configFileName;
+    string configFilePath = "./" + configName;
+    Logger::getInstance().info("Plik konfiguracyjny: [%s]", configFilePath.c_str());
     ifstream file(configFilePath.c_str(), ios::in);
     if (!file.is_open()) {
         Logger::getInstance().error("Nie mogę otworzyć pliku do odczytu: [%s]", configFilePath.c_str());
@@ -11,9 +13,9 @@ Config::Config(string configFileName) {
     }
 
     string line;
-    int requiredValues = 15;
+    int requiredValues = 16;
     while (getline(file, line)) {
-        Logger::getInstance().info(line, 0);
+        Logger::getInstance().debug1(line, 0);
 
         if (line[0] == '#') {
             continue;
@@ -37,6 +39,7 @@ Config::Config(string configFileName) {
         else if (key == "vySlow") vySlow = atof(value.c_str());
         else if (key == "vyMedium") vyMedium = atof(value.c_str());
         else if (key == "vyFast") vyFast = atof(value.c_str());
+        else if (key == "exportDirectory") exportDirectory = value;
         else {
             Logger::getInstance().error("Nieznany parametr konfiguracyjny: [%s = %s]", key.c_str(), value.c_str());
             exit(0);
@@ -76,5 +79,5 @@ Config::Config(string configFileName) {
 
     file.close();
 
-    Logger::getInstance().info("Poprawnie odczytano config: [%s]", configFilePath.c_str());
+    Logger::getInstance().info("Poprawnie odczytano plik konfiguracyjny: [%s]", configFilePath.c_str());
 }

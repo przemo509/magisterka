@@ -15,6 +15,7 @@ public:
     virtual ~ExplosionSimulation();
 
     void proceed();
+    vect3f getDens() const;
 
     void setStartingConditions();
 

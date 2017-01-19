@@ -14,3 +14,4 @@ mainSourceDensity       = 0.05
 vySlow                  = 0.03
 vyMedium                = 0.2
 vyFast                  = 0.7
+exportDirectory         = D:/mgr_data/simulator_output

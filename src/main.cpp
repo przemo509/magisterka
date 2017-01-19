@@ -1,6 +1,7 @@
 #include "simulation/ExplosionSimulation.h"
 #include "utils/Config.h"
 #include "utils/Timer.h"
+#include "utils/BlenderExport.h"
 
 ExplosionSimulation *simulation;
 
@@ -17,6 +18,7 @@ int main(int argc, char **argv) {
     Logger::getInstance().info("Początek przetwarzania %s", configFileName.c_str());
 
     simulation = new ExplosionSimulation();
+    exportDensity(simulation->getDens(), true);
 
     int currentFrame = 0;
     while (currentFrame <= Config::getInstance()->maxFrames) {
@@ -28,6 +30,7 @@ int main(int argc, char **argv) {
         }
 
         simulation->proceed();
+        exportDensity(simulation->getDens());
     }
 
     Logger::getInstance().info("Koniec przetwarzania %s", configFileName.c_str());

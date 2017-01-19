@@ -48,6 +48,9 @@ public:
 
     const int relaxationSteps = 12; // liczba iteracji relaksacji Gaussa-Seidela
 
+    string configName;
+    string exportDirectory;
+
     static Config *getInstance() {
         return instance;
     }
