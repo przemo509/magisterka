@@ -75,7 +75,7 @@ void Logger::debug5(string format, ...) {
 }
 
 void Logger::debug(DebugLevel lvl, string format, va_list args) {
-    if(lvl > currentLevel) {
+    if(lvl <= currentLevel) {
         log(cout, "DBG_" + to_string(static_cast<int>(lvl)), format, args);
     }
 }
