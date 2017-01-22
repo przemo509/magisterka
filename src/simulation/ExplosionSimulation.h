@@ -15,7 +15,8 @@ public:
     virtual ~ExplosionSimulation();
 
     void proceed();
-    vect3f getDens() const;
+    vect3f getDensityArray() const;
+    int getArraysSize() const;
 
     void setStartingConditions();
 

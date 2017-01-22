@@ -3,8 +3,12 @@
 #include "../utils/MathUtils.h"
 #include "../utils/Timer.h"
 
-vect3f ExplosionSimulation::getDens() const {
+vect3f ExplosionSimulation::getDensityArray() const {
     return dens;
+}
+
+int ExplosionSimulation::getArraysSize() const {
+    return N + 2;
 }
 
 ExplosionSimulation::ExplosionSimulation() {
@@ -35,7 +39,7 @@ ExplosionSimulation::ExplosionSimulation() {
 }
 
 void ExplosionSimulation::allocate3D(vect3f &t) {
-    int size = N + 2;
+    int size = getArraysSize();
     t = new float **[size];
     for (int i = 0; i < size; ++i) {
         t[i] = new float *[size];
@@ -57,7 +61,7 @@ ExplosionSimulation::~ExplosionSimulation() {
 }
 
 void ExplosionSimulation::deallocate3D(vect3f &t) {
-    int size = N + 2;
+    int size = getArraysSize();
     for (int i = 0; i < size; ++i) {
         for (int j = 0; j < size; ++j) {
             delete[] t[i][j];
@@ -82,7 +86,7 @@ void ExplosionSimulation::setStartingConditions() {
 }
 
 void ExplosionSimulation::clearSpace() {
-    int size = N + 2;
+    int size = getArraysSize();
     for (int k = 0; k < size; ++k) {
         for (int j = 0; j < size; ++j) {
             for (int i = 0; i < size; ++i) {
@@ -152,7 +156,7 @@ void ExplosionSimulation::addSources() {
 }
 
 void ExplosionSimulation::addForces() {
-    int size = N + 2;
+    int size = getArraysSize();
     for (int k = 0; k < size; ++k) {
         for (int j = 0; j < size; ++j) {
             for (int i = 0; i < size; ++i) {
@@ -172,7 +176,7 @@ void ExplosionSimulation::addTurbulences() {
     }
 
     for (int i = 0; i < Config::getInstance()->verticesCount; ++i) {
-        vertices[i]->apply(vx, vy, vz, N + 2);
+        vertices[i]->apply(vx, vy, vz, getArraysSize());
     }
 }
 

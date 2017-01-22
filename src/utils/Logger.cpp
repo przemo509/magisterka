@@ -3,7 +3,10 @@
 #include <iomanip>
 #include <cstdlib>
 #include <sstream>
+#include <fstream>
+#include <cstring>
 #include "Logger.h"
+#include "StringUtils.h"
 
 extern "C"
 {
@@ -12,7 +15,16 @@ extern "C"
 
 using namespace std;
 
-Logger::Logger() {
+Logger *Logger::instance;
+
+Logger::Logger(string dataDirectoryWithPrefix) {
+    logFilePath = dataDirectoryWithPrefix + "_log.txt";
+    ofstream logFile(logFilePath, ios::out);
+    if (!logFile.is_open()) {
+        cerr << "Blad otwarcia pliku [" + logFilePath + "]. Szczegoly:\nkod=[" + intToString(errno) + "]\nkomunikat=[" + strerror(errno) + "]\n\nKoncze prace!";
+        exit(EXIT_FAILURE);
+    }
+    logFile.close();
 }
 
 Logger::~Logger() {
@@ -75,15 +87,9 @@ void Logger::debug5(string format, ...) {
 }
 
 void Logger::debug(DebugLevel lvl, string format, va_list args) {
-    if(lvl <= currentLevel) {
-        log(cout, "DBG_" + to_string(static_cast<int>(lvl)), format, args);
+    if (lvl <= currentLevel) {
+        log(cout, "DBG_" + intToString(static_cast<int>(lvl)), format, args);
     }
-}
-
-string Logger::to_string(int i) {
-    stringstream ss;
-    ss << i;
-    return ss.str();
 }
 
 void Logger::log(ostream &stream, string level, string format, va_list args) {
@@ -91,16 +97,28 @@ void Logger::log(ostream &stream, string level, string format, va_list args) {
 
     time_t t = time(NULL);
     struct tm *now = localtime(&t);
-    stream << setfill('0')
-           << setw(4) << (now->tm_year + 1900) << "-"
-           << setw(2) << (now->tm_mon + 1) << "-"
-           << setw(2) << now->tm_mday << " "
-           << setw(2) << now->tm_hour << ":"
-           << setw(2) << now->tm_min << ":"
-           << setw(2) << now->tm_sec << " "
-           << setfill(' ')
-           << "[" << setw(5) << level << "] "
-           << msg << endl;
+
+    stringstream ss;
+    ss << setfill('0')
+       << setw(4) << (now->tm_year + 1900) << "-"
+       << setw(2) << (now->tm_mon + 1) << "-"
+       << setw(2) << now->tm_mday << " "
+       << setw(2) << now->tm_hour << ":"
+       << setw(2) << now->tm_min << ":"
+       << setw(2) << now->tm_sec << " "
+       << setfill(' ')
+       << "[" << setw(5) << level << "] "
+       << msg << endl;
+    string str = ss.str();
+    stream << str;
+
+    ofstream logFile(logFilePath, ios::app);
+    if (!logFile.is_open()) {
+        cerr << "Blad otwarcia pliku [" + logFilePath + "]. Szczegoly:\nkod=[" + intToString(errno) + "]\nkomunikat=[" + strerror(errno) + "]\n\nKoncze prace!";
+        exit(EXIT_FAILURE);
+    }
+    logFile << str;
+    logFile.close();
 }
 
 string Logger::formatMessage(string format, va_list args) {

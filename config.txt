@@ -1,0 +1,10 @@
+# konfiguracja główna
+# ścieżki do katalogów muszą być bezwzględne
+# ścieżki nie mogą zawierać spacji
+# jeśli zawierają, dodać do PATH i używać stamtąd
+
+dataDirectory           = C:\Users\ps\ClionProjects\magisterka\data
+blenderExecutablePath   = blender
+pythonScriptPath        = blender_render_frame.py
+blenderScenePath        = scene.blend
+ffmpegExecutablePath    = ffmpeg

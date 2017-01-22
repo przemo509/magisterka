@@ -14,17 +14,18 @@ Timer::Timer() {
 Timer::~Timer() {
 }
 
-void Timer::incrementFrame() {
+int Timer::incrementFrame() {
     ++currentFrame;
     ++framesInSecond;
     currTime = time(NULL);
-    Logger::getInstance().debug2("Frame: %i", currentFrame);
+    Logger::getInstance()->debug2("Frame: %i", currentFrame);
     long interval = currTime - prevTime;
     if (interval > 1000) {
         prevTime = currTime;
-        Logger::getInstance().debug1("FPS: %f", framesInSecond / (interval / 1000.0f));
+        Logger::getInstance()->debug1("FPS: %f", framesInSecond / (interval / 1000.0f));
         framesInSecond = 0;
     }
+    return currentFrame;
 }
 
 long Timer::getCurrentTime() {

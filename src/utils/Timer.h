@@ -9,7 +9,7 @@ public:
         return instance;
     }
 
-    void incrementFrame();
+    int incrementFrame();
 
     long getCurrentTime();
 

@@ -49,20 +49,28 @@ public:
     const int relaxationSteps = 12; // liczba iteracji relaksacji Gaussa-Seidela
 
     string configName;
-    string exportDirectory;
+    string dataDirectoryWithPrefix;
+    string configFilePath;
+    string blenderExecutablePath;
+    string pythonScriptPath;
+    string blenderScenePath;
+    string ffmpegExecutablePath;
 
     static Config *getInstance() {
         return instance;
     }
 
-    static void init(string configFileName) {
-        instance = new Config(configFileName);
+    static void init(string configName) {
+        instance = new Config(configName);
     }
 
 private:
+    const int requiredMainConfigValues = 5;
+    const int requiredConfigValues = 15;
+
     static Config *instance;
 
-    Config(string configFileName);
+    Config(string configName);
 
     ~Config() {}
 
@@ -70,6 +78,11 @@ private:
 
     void operator=(Config const &);
 
+    void readMainConfig(string filePath);
+
+    void readConfig();
+
+    void configureExplosionSource();
 
 };
 

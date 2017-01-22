@@ -14,10 +14,15 @@ enum DebugLevel {
 class Logger {
 public:
 
-    static Logger &getInstance() {
-        static Logger instance;
+    static Logger *getInstance() {
         return instance;
     }
+
+    static void init(string dataDirectoryWithPrefix) {
+        instance = new Logger(dataDirectoryWithPrefix);
+    }
+
+    void setCurrentLevel(DebugLevel currentLevel);
 
     void error(string format, ...);
 
@@ -36,18 +41,17 @@ public:
     void warning(string format, ...);
 
 private:
-    DebugLevel currentLevel = DEBUG_OFF;
-public:
-    void setCurrentLevel(DebugLevel currentLevel);
+    static Logger *instance;
 
-private:
+    DebugLevel currentLevel = DEBUG_OFF;
+
     void log(ostream &stream, string level, string format, va_list args);
 
     void debug(DebugLevel lvl, string format, va_list args);
 
     string formatMessage(string format, va_list args);
 
-    Logger();
+    Logger(string dataDirectoryWithPrefix);
 
     Logger(Logger const &);
 
@@ -55,7 +59,7 @@ private:
 
     virtual ~Logger();
 
-    string to_string(int i);
+    string logFilePath;
 };
 
 #endif //MAGISTERKA_LOGGER_H

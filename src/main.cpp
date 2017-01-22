@@ -1,40 +1,43 @@
 #include "simulation/ExplosionSimulation.h"
 #include "utils/Config.h"
 #include "utils/Timer.h"
-#include "utils/BlenderExport.h"
-
-ExplosionSimulation *simulation;
+#include "utils/ExternalRenderer.h"
 
 int main(int argc, char **argv) {
     if (argc != 2) {
-        Logger::getInstance().error("Błędne wywołanie, spróbuj tak:");
-        Logger::getInstance().error("%s plik_konfiguracyjny", argv[0]);
-        exit(0);
+        cerr << "Błędne wywołanie, spróbuj tak:";
+        cerr << "%s plik_konfiguracyjny" << argv[0];
+        exit(EXIT_FAILURE);
     }
 
-    string configFileName = string(argv[1]);
-    Config::init(configFileName);
+    string configName = string(argv[1]);
+    Config::init(configName);
 
-    Logger::getInstance().info("Początek przetwarzania %s", configFileName.c_str());
+    Logger::getInstance()->info("Początek przetwarzania %s", configName.c_str());
 
-    simulation = new ExplosionSimulation();
-    exportDensity(simulation->getDens(), true);
+    // Klatka nr 1, pusta symulacja.
+    int currentFrame = Timer::getInstance().incrementFrame();
+    ExplosionSimulation *simulation = new ExplosionSimulation();
+    ExternalRenderer *renderer = new ExternalRenderer(simulation);
+    renderer->renderFrame(currentFrame);
 
-    int currentFrame = 0;
-    while (currentFrame <= Config::getInstance()->maxFrames) {
-        currentFrame = Timer::getInstance().getCurrentFrame();
-        Timer::getInstance().incrementFrame();
+    while (currentFrame < Config::getInstance()->maxFrames) {
+        currentFrame = Timer::getInstance().incrementFrame();
 
         if (currentFrame % Config::getInstance()->framesToSkipRender != 0) {
             continue;
         }
 
         simulation->proceed();
-        exportDensity(simulation->getDens());
+        renderer->renderFrame(currentFrame);
     }
 
-    Logger::getInstance().info("Koniec przetwarzania %s", configFileName.c_str());
+    renderer->makeVideo(currentFrame);
 
+    Logger::getInstance()->info("Koniec przetwarzania %s", configName.c_str());
+
+    delete renderer;
+    delete simulation;
     return 0;
 
 }

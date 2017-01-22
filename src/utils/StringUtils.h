@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <iomanip>
 
 using namespace std;
 
@@ -37,6 +38,18 @@ static inline string &rtrim(string &s) {
 
 static inline string &trim(string &s) {
     return ltrim(rtrim(s));
+}
+
+static inline string intToString(int i) {
+    stringstream ss;
+    ss << i;
+    return ss.str();
+}
+
+static inline string intToString(int i, int width, char padding) {
+    stringstream ss;
+    ss << setfill(padding) << setw(width) << i << setfill(' ');
+    return ss.str();
 }
 
 #endif //MAGISTERKA_STRINGUTILS_H
