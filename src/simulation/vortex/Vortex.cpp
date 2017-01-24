@@ -42,7 +42,7 @@ bool Vortex::shouldBeRemoved() {
 }
 
 bool Vortex::isBehindRemovalBorder() {
-    return position.x <= vertexRemovalBorder || position.x >= domainSize - vertexRemovalBorder ||
-           position.y <= vertexRemovalBorder || position.y >= domainSize - vertexRemovalBorder ||
-           position.z <= vertexRemovalBorder || position.z >= domainSize - vertexRemovalBorder;
+    return position.x <= vortexRemovalBorder || position.x >= domainSize - vortexRemovalBorder ||
+           position.y <= vortexRemovalBorder || position.y >= domainSize - vortexRemovalBorder ||
+           position.z <= vortexRemovalBorder || position.z >= domainSize - vortexRemovalBorder;
 }

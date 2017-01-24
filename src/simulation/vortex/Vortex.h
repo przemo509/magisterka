@@ -13,7 +13,7 @@ public:
     void apply(vect3f vx, vect3f vy, vect3f vz);
 
 private:
-    static const int vertexRemovalBorder = 5; // TODO zbadać rózne ustawienia
+    static const int vortexRemovalBorder = 5; // TODO zbadać rózne ustawienia
     const int domainSize;
 
     Point position;

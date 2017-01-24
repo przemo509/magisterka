@@ -46,13 +46,13 @@ void VerticesList::addNewVertices() {
     int frame = Timer::getInstance().getCurrentFrame();
     int newVerticesCount = verticesDistribution[frame];
     for (int i = 0; i < newVerticesCount; i++) {
-        addNewVertex();
+        addNewVortex();
     }
 }
 
-void VerticesList::addNewVertex() {
+void VerticesList::addNewVortex() {
     int vortexInitX = randAround(fluidSource->positionX, 2);
     int vortexInitZ = randAround(fluidSource->positionZ, 2);
-    Vortex *vertex = new Vortex(vortexInitX, vortexInitY, vortexInitZ, domainSize);
-    add(vertex);
+    Vortex *vortex = new Vortex(vortexInitX, vortexInitY, vortexInitZ, domainSize);
+    add(vortex);
 }

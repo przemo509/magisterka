@@ -23,7 +23,7 @@ private:
     int *verticesDistribution;
     FluidSource *fluidSource;
 
-    void addNewVertex();
+    void addNewVortex();
 
     void calculateVerticesDistribution();
 };
