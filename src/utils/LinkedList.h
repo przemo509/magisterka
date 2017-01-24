@@ -34,6 +34,7 @@ protected:
             first = node;
         } else { // <=> last != NULL
             last->next = node;
+            node->prev = last;
         }
         last = node;
         currentCount++;
