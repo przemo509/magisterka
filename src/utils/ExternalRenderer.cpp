@@ -71,7 +71,10 @@ void ExternalRenderer::runBlender(string densityFilePath, int frame) {
                         " " + intToString(size) +
                         " " + intToString(size) +
                         " " + Config::getInstance()->configFilePath +
-                        " \"frame                   = " + intToString(frame, 3, '0') + "\"" +
+                        " \"frame           = " + intToString(frame, 6, '0') + "\"" +
+                        " \"verticesActive  = " + intToString(simulation->vertices->getCurrentCount(), 6, '0') + "\"" +
+                        " \"verticesTotal   = " + intToString(simulation->vertices->getCreatedCount(), 6, '0') + "\"" +
+                        " \"verticesRemoved = " + intToString(simulation->vertices->getDeletedCount(), 6, '0') + "\"" +
                         " > " + dataDirectoryWithPrefix + "_blender_log.txt 2>&1";
 
     int code = system(blenderCmd.c_str());
@@ -91,6 +94,7 @@ void ExternalRenderer::makeVideo(int frames) {
                  " -i " + dataDirectoryWithPrefix + "_blender_render_%03d.png" +
                  " -c:v ffv1" +
                  " -qscale:v 0" +
+//                 " -vf \"[in]drawtext=fontfile='UbuntuMono-Regular.ttf':text='Frame %{n}', drawtext=fontfile='UbuntuMono-Regular.ttf':textfile='data\\\\config_test\\\\config_test.txt':y=20\"" +
                  " " + dataDirectoryWithPrefix + ".avi";
 
     int code = system(cmd.c_str());

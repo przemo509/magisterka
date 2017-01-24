@@ -3,6 +3,7 @@
 
 #include "StringUtils.h"
 #include "Logger.h"
+#include "../simulation/source/FluidSource.h"
 
 #include <iostream>
 #include <fstream>
@@ -11,8 +12,9 @@ using namespace std;
 
 class Config {
 public:
+    static const char numbersDelimiter = ';';
+
     int maxFrames;
-    int simulationLengthFrames = 400;
     const int framesToSkipRender = 1; // 1 żeby renderować wszystkie klatki
 
     const bool simulateTurbulences = true;
@@ -23,28 +25,18 @@ public:
     int vortexRadiusMax;
 
     const int simulationSpaceSize = 100;
-
     const float dt = 0.25;
+
     float viscosity;
     float diffusionRate;
-
-    const int mainSourceHeight = 3;
-    const int mainSourceRadius = 6;
-    const int mainSourceCenterX = 0 + mainSourceRadius + 5; // po lewej stronie, trochę dalej od krawędzi;
-    const int mainSourceCenterZ = simulationSpaceSize / 2;
-    float mainSourceDensity;
-    const float mainSourceSpreadFactor = 0.35;
-    float vySlow = 0;
-    float vyMedium = 0;
-    float vyFast = 0;
-    float mainSourceVY = 0;
-    float explosionSource[10][2];
-    int explosionSourcePhases;
-
     float thermalBuoyancyFactor;
-
     float gravityFactor;
     float windFactor;
+
+    float sourceDensity;
+    string sourceVelocitiesValuesString;
+    string sourcePhaseFramesString;
+    string sourcePhaseVelocitiesIdxsString;
 
     const int relaxationSteps = 12; // liczba iteracji relaksacji Gaussa-Seidela
 
@@ -81,9 +73,6 @@ private:
     void readMainConfig(string filePath);
 
     void readConfig();
-
-    void configureExplosionSource();
-
 };
 
 

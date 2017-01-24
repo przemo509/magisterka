@@ -2,7 +2,9 @@
 #define MAGISTERKA_EXPLOSIONSIMULATION_H
 
 #include "../utils/GeometryUtils.h"
-#include "Vortex.h"
+#include "vortex/Vortex.h"
+#include "vortex/VerticesList.h"
+#include "source/FluidSource.h"
 
 enum BoundDirection {
     X_DIR, Y_DIR, Z_DIR, NO_DIR
@@ -27,7 +29,8 @@ private:
     float dt, viscosity, diffusionRate;
     int relaxationSteps;
 
-    Vortex **vertices;
+    FluidSource *source;
+    VerticesList *vertices;
 
     void calculateVelocities();
 
@@ -53,11 +56,7 @@ private:
 
     void clearSpace();
 
-    void clearVerticesIfNeeded();
-
-    void createNewVertices();
-
-    friend class ExplosionVisualization;
+    friend class ExternalRenderer;
 
 };
 

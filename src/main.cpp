@@ -1,5 +1,4 @@
 #include "simulation/ExplosionSimulation.h"
-#include "utils/Config.h"
 #include "utils/Timer.h"
 #include "utils/ExternalRenderer.h"
 

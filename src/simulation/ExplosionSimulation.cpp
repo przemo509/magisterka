@@ -1,6 +1,5 @@
 #include "ExplosionSimulation.h"
 #include "../utils/Config.h"
-#include "../utils/MathUtils.h"
 #include "../utils/Timer.h"
 
 vect3f ExplosionSimulation::getDensityArray() const {
@@ -30,10 +29,8 @@ ExplosionSimulation::ExplosionSimulation() {
     allocate3D(dens);
     allocate3D(densPrev);
 
-    vertices = new Vortex *[Config::getInstance()->verticesCount];
-    for (int i = 0; i < Config::getInstance()->verticesCount; ++i) {
-        vertices[i] = NULL;
-    }
+    source = new FluidSource(Config::getInstance());
+    vertices = new VerticesList(getArraysSize(), source);
 
     setStartingConditions();
 }
@@ -58,6 +55,8 @@ ExplosionSimulation::~ExplosionSimulation() {
     deallocate3D(vzPrev);
     deallocate3D(dens);
     deallocate3D(densPrev);
+    delete source;
+    delete vertices;
 }
 
 void ExplosionSimulation::deallocate3D(vect3f &t) {
@@ -71,18 +70,8 @@ void ExplosionSimulation::deallocate3D(vect3f &t) {
     delete[] t;
 }
 
-void ExplosionSimulation::clearVerticesIfNeeded() {
-    for (int i = 0; i < Config::getInstance()->verticesCount; ++i) {
-        if (vertices[i] != NULL) {
-            delete vertices[i];
-        }
-    }
-}
-
 void ExplosionSimulation::setStartingConditions() {
     clearSpace();
-    clearVerticesIfNeeded();
-    createNewVertices();
 }
 
 void ExplosionSimulation::clearSpace() {
@@ -103,19 +92,6 @@ void ExplosionSimulation::clearSpace() {
     }
 }
 
-void ExplosionSimulation::createNewVertices() {
-    int vortexInitY = 10;
-    int verticesStartsFromFrame = 10;
-    int verticesStartsToFrame = Config::getInstance()->simulationLengthFrames;
-    float vortexEveryFrame =
-            (float) ((verticesStartsToFrame - verticesStartsFromFrame)) / Config::getInstance()->verticesCount;
-    for (int v = 0; v < Config::getInstance()->verticesCount; ++v) {
-        vertices[v] = new Vortex(randAround(Config::getInstance()->mainSourceCenterX, 2), vortexInitY,
-                                 randAround(Config::getInstance()->mainSourceCenterZ, 2),
-                                 v * vortexEveryFrame);
-    }
-}
-
 void ExplosionSimulation::proceed() {
     addSources();
     addForces();
@@ -125,31 +101,27 @@ void ExplosionSimulation::proceed() {
 }
 
 void ExplosionSimulation::addSources() {
-    const int currentFrame = Timer::getInstance().getCurrentFrame();
+    int startX = source->getStartX();
+    int endX = source->getEndX();
+    int startY = source->getStartY();
+    int endY = source->getEndY();
+    int endZ = source->getEndZ();
+    int startZ = source->getStartZ();
+    float dvy = dt * source->getCurrentVelocity(); // bieżąca prędkość źródła w górę
 
-    int height = Config::getInstance()->mainSourceHeight;
-    int radius = Config::getInstance()->mainSourceRadius;
-    int centerX = Config::getInstance()->mainSourceCenterX;
-    int centerZ = Config::getInstance()->mainSourceCenterZ;
-
-    float phaseVelocity = 0.0;
-    for (int nextPhase = 1; nextPhase < Config::getInstance()->explosionSourcePhases; ++nextPhase) {
-        int nextPhaseStartFrame = Config::getInstance()->explosionSource[nextPhase][0];
-        if (nextPhaseStartFrame > currentFrame) {
-            phaseVelocity = Config::getInstance()->explosionSource[nextPhase - 1][1];
-            break;
-        }
-
-    }
-
-    for (int k = centerZ - radius; k < centerZ + radius; ++k) {
-        for (int j = 2; j < height + 2; ++j) {
-            for (int i = centerX - radius; i < centerX + radius; ++i) {
-                dens[i][j][k] += dt / (sqrt((i - centerX) * (i - centerX) + (k - centerZ) * (k - centerZ)) + 0.01) *
-                                 Config::getInstance()->mainSourceDensity;
-                vx[i][j][k] += dt * sin(i - centerX) * Config::getInstance()->mainSourceSpreadFactor; // na zewnątrz
-                vz[i][j][k] += dt * sin(k - centerZ) * Config::getInstance()->mainSourceSpreadFactor; // na zewnątrz
-                vy[i][j][k] += dt * phaseVelocity;
+    // pętla po wszystkich komórkach źródła (które nie jest punktowe, tylko ma swoją objetość)
+    for (int k = startZ; k < endZ; ++k) {
+        int dk = k - source->positionZ;
+        double dvz = dt * sin(dk) * source->spreadFactor; // na zewnątrz
+        for (int j = startY; j < endY; ++j) {
+            for (int i = startX; i < endX; ++i) {
+                int di = i - source->positionX;
+                double dd = dt / (sqrt(di * di + dk * dk) + 0.01) * source->density;
+                double dvx = dt * sin(di) * source->spreadFactor;  // na zewnątrz
+                dens[i][j][k] += dd;
+                vx[i][j][k] += dvx;
+                vz[i][j][k] += dvz;
+                vy[i][j][k] += dvy;
             }
         }
     }
@@ -175,9 +147,8 @@ void ExplosionSimulation::addTurbulences() {
         return;
     }
 
-    for (int i = 0; i < Config::getInstance()->verticesCount; ++i) {
-        vertices[i]->apply(vx, vy, vz, getArraysSize());
-    }
+    vertices->addNewVertices();
+    vertices->applyAll(vx, vy, vz);
 }
 
 void ExplosionSimulation::calculateVelocities() {

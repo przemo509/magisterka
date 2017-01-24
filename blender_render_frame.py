@@ -14,7 +14,7 @@ xRes = int(argv[1])
 yRes = int(argv[2])
 zRes = int(argv[3])
 configFilePath = argv[4]
-additionalTextToDisplay = argv[5]
+additionalTextsToDisplay = argv[5:]
 
 bpy.context.scene.objects.active = bpy.data.objects['domain']
 bpy.data.textures["Tex"].voxel_data.filepath = densityFilePath
@@ -25,6 +25,7 @@ bpy.data.textures["Tex"].voxel_data.resolution[2] = zRes
 bpy.context.scene.objects.active = bpy.data.objects['Text']
 bpy.ops.object.editmode_toggle()
 bpy.ops.font.text_paste_from_file(filepath=configFilePath)
-bpy.ops.font.line_break()
-bpy.ops.font.text_insert(text=additionalTextToDisplay)
+for text in additionalTextsToDisplay:
+    bpy.ops.font.line_break()
+    bpy.ops.font.text_insert(text=text)
 bpy.ops.object.editmode_toggle()
