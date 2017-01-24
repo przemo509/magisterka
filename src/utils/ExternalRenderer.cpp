@@ -92,10 +92,7 @@ void ExternalRenderer::makeVideo(int frames) {
                  " -y" +
                  " -loglevel panic" +
                  " -i " + dataDirectoryWithPrefix + "_blender_render_%03d.png" +
-                 " -c:v ffv1" +
-                 " -qscale:v 0" +
-//                 " -vf \"[in]drawtext=fontfile='UbuntuMono-Regular.ttf':text='Frame %{n}', drawtext=fontfile='UbuntuMono-Regular.ttf':textfile='data\\\\config_test\\\\config_test.txt':y=20\"" +
-                 " " + dataDirectoryWithPrefix + ".avi";
+                 " " + dataDirectoryWithPrefix + ".mp4";
 
     int code = system(cmd.c_str());
     if (code != 0) {
