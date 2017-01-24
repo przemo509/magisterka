@@ -100,7 +100,7 @@ void ExternalRenderer::makeVideo(int frames) {
         Logger::getInstance()->error("Błąd komendy:\n%s", cmd.c_str());
         exit(code);
     } else {
-        Logger::getInstance()->info("Film %s.avi zmontowany", dataDirectoryWithPrefix.c_str());
+        Logger::getInstance()->info("Film %s.mp4 zmontowany", dataDirectoryWithPrefix.c_str());
     }
 
     removeRenderedFrames(frames);
