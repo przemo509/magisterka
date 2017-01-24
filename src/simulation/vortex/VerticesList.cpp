@@ -53,6 +53,6 @@ void VerticesList::addNewVertices() {
 void VerticesList::addNewVortex() {
     int vortexInitX = randAround(fluidSource->positionX, 2);
     int vortexInitZ = randAround(fluidSource->positionZ, 2);
-    Vortex *vortex = new Vortex(vortexInitX, vortexInitY, vortexInitZ, domainSize);
+    Vortex *vortex = new Vortex(getCurrentCount(), vortexInitX, vortexInitY, vortexInitZ, domainSize);
     add(vortex);
 }

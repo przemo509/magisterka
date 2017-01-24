@@ -6,7 +6,7 @@
 
 class Vortex : public LinkedListNode {
 public:
-    Vortex(int x, int y, int z, int domainSize);
+    Vortex(int id, int x, int y, int z, int domainSize);
 
     virtual ~Vortex();
 
@@ -15,6 +15,7 @@ public:
 private:
     static const int vortexRemovalBorder = 5; // TODO zbadać rózne ustawienia
     const int domainSize;
+    const int id;
 
     Point position;
     Vector direction; // rotacja + prędkość
@@ -23,7 +24,7 @@ private:
 
     bool shouldBeRemoved();
 
-    bool isBehindRemovalBorder();
+    bool isBehindBorder(int border);
 
     friend class VerticesList;
 };

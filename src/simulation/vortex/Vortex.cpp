@@ -2,7 +2,7 @@
 #include "../../utils/MathUtils.h"
 #include "../../utils/Config.h"
 
-Vortex::Vortex(int x, int y, int z, int domainSize) : domainSize(domainSize) {
+Vortex::Vortex(int id, int x, int y, int z, int domainSize) : id(id), domainSize(domainSize) {
     position = Point(x, y, z);
     direction = Vector(rand(0, 50), rand(0, 50), rand(0, 50));
     radius = rand(Config::getInstance()->vortexRadiusMin, Config::getInstance()->vortexRadiusMax);
@@ -31,18 +31,21 @@ void Vortex::apply(vect3f vx, vect3f vy, vect3f vz) {
         }
     }
 
-    position.x += Config::getInstance()->vortexMoving * vx[(int) position.x][(int) position.y][(int) position.z];
-    position.y += Config::getInstance()->vortexMoving * vy[(int) position.x][(int) position.y][(int) position.z];
-    position.z += Config::getInstance()->vortexMoving * vz[(int) position.x][(int) position.y][(int) position.z];
+    int oldX = (int) position.x;
+    int oldY = (int) position.y;
+    int oldZ = (int) position.z;
+    position.x += Config::getInstance()->vortexMoving * vx[oldX][oldY][oldZ];
+    position.y += Config::getInstance()->vortexMoving * vy[oldX][oldY][oldZ];
+    position.z += Config::getInstance()->vortexMoving * vz[oldX][oldY][oldZ];
     framesLived++;
 }
 
 bool Vortex::shouldBeRemoved() {
-    return framesLived > 10 && isBehindRemovalBorder(); // TODO zbadać różne ustawienia
+    return isBehindBorder(0) || (framesLived > 10 && isBehindBorder(vortexRemovalBorder)); // TODO zbadać różne ustawienia
 }
 
-bool Vortex::isBehindRemovalBorder() {
-    return position.x <= vortexRemovalBorder || position.x >= domainSize - vortexRemovalBorder ||
-           position.y <= vortexRemovalBorder || position.y >= domainSize - vortexRemovalBorder ||
-           position.z <= vortexRemovalBorder || position.z >= domainSize - vortexRemovalBorder;
+bool Vortex::isBehindBorder(int border) {
+    return position.x <= border || position.x >= domainSize - border ||
+           position.y <= border || position.y >= domainSize - border ||
+           position.z <= border || position.z >= domainSize - border;
 }
