@@ -43,6 +43,7 @@ public:
     string configName;
     string dataDirectoryWithPrefix;
     string configFilePath;
+    string configDescription;
     string blenderExecutablePath;
     string pythonScriptPath;
     string blenderScenePath;
@@ -57,8 +58,8 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 5;
-    const int requiredConfigValues = 15;
+    const int requiredMainConfigValues = 20;
+    const string mainConfigFilePath = ".\\config.txt";
 
     static Config *instance;
 
@@ -70,9 +71,8 @@ private:
 
     void operator=(Config const &);
 
-    void readMainConfig(string filePath);
+    void readConfig(bool isMain);
 
-    void readConfig();
 };
 
 

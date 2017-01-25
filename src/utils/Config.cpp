@@ -4,19 +4,26 @@ Config *Config::instance;
 
 Config::Config(string configName) {
     this->configName = configName;
-    readMainConfig(".\\config.txt");
-    readConfig();
+    readConfig(true);
+    readConfig(false);
 }
 
-void Config::readMainConfig(string filePath) {
+void Config::readConfig(bool isMain) {
+    string filePath = isMain ? mainConfigFilePath : configFilePath;
     ifstream file(filePath.c_str(), ios::in);
     if (!file.is_open()) {
-        cerr << "Nie mogę otworzyć pliku do odczytu: " << filePath;
+        cerr << "Nie mogę otworzyć pliku do odczytu: " << filePath << endl;
         exit(EXIT_FAILURE);
     }
 
     string line;
     int readValues = 0;
+    if(!isMain) {
+        getline(file, line);
+        line[0] = ' '; // pozbycie się #
+        line = trim(line); // pozbycie się spacji
+        configDescription = line;
+    }
     while (getline(file, line)) {
         if (line[0] == '#' || line.length() == 0) {
             continue;
@@ -33,45 +40,7 @@ void Config::readMainConfig(string filePath) {
         else if (key == "pythonScriptPath") pythonScriptPath = value;
         else if (key == "blenderScenePath") blenderScenePath = value;
         else if (key == "ffmpegExecutablePath") ffmpegExecutablePath = value;
-        else {
-            Logger::getInstance()->error("Nieznany parametr konfiguracyjny: [%s = %s]", key.c_str(), value.c_str());
-            exit(EXIT_FAILURE);
-        }
-
-        Logger::getInstance()->debug1(line);
-        readValues++;
-    }
-
-    if (readValues != requiredMainConfigValues) {
-        Logger::getInstance()->error("Brak parametów konfiguracyjnych w liczbie: %d", requiredMainConfigValues - readValues);
-        exit(EXIT_FAILURE);
-    }
-
-    file.close();
-    Logger::getInstance()->info("Poprawnie odczytano główny plik konfiguracyjny: [%s]", filePath.c_str());
-}
-
-void Config::readConfig() {
-    Logger::getInstance()->info("Odczytuję plik konfiguracyjny: [%s]", configFilePath.c_str());
-    ifstream file(configFilePath.c_str(), ios::in);
-    if (!file.is_open()) {
-        Logger::getInstance()->error("Nie mogę otworzyć pliku do odczytu: [%s]", configFilePath.c_str());
-        exit(EXIT_FAILURE);
-    }
-
-    string line;
-    int readValues = 0;
-    while (getline(file, line)) {
-        Logger::getInstance()->debug1(line);
-
-        if (line[0] == '#') {
-            continue;
-        }
-        vector<string> lineItems = split(line, '=');
-        string key = trim(lineItems[0]);
-        string value = trim(lineItems[1]);
-
-        if (key == "maxFrames") maxFrames = atoi(value.c_str());
+        else if (key == "maxFrames") maxFrames = atoi(value.c_str());
         else if (key == "verticesCount") verticesCount = atoi(value.c_str());
         else if (key == "vortexStrength") vortexStrength = atof(value.c_str());
         else if (key == "vortexMoving") vortexMoving = atoi(value.c_str());
@@ -91,14 +60,15 @@ void Config::readConfig() {
             exit(EXIT_FAILURE);
         }
 
+        Logger::getInstance()->debug1(line);
         readValues++;
     }
 
-    if (readValues != requiredConfigValues) {
-        Logger::getInstance()->error("Brak parametów konfiguracyjnych w liczbie: %d", requiredConfigValues - readValues);
+    if (isMain && readValues != requiredMainConfigValues) {
+        Logger::getInstance()->error("Brak parametów konfiguracyjnych w liczbie: %d", requiredMainConfigValues - readValues);
         exit(EXIT_FAILURE);
     }
 
     file.close();
-    Logger::getInstance()->info("Poprawnie odczytano plik konfiguracyjny: [%s]", configFilePath.c_str());
+    Logger::getInstance()->info("Poprawnie odczytano plik konfiguracyjny: [%s]", filePath.c_str());
 }
