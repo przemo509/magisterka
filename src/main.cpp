@@ -9,6 +9,8 @@ int main(int argc, char **argv) {
         exit(EXIT_FAILURE);
     }
 
+    long programStartTime = Timer::getInstance().getCurrentTime();
+
     string configName = string(argv[1]);
     Config::init(configName);
 
@@ -38,6 +40,7 @@ int main(int argc, char **argv) {
     renderer->makeVideo(currentFrame);
 
     Logger::getInstance()->info("Koniec przetwarzania %s", configName.c_str());
+    Logger::getInstance()->info("Czas trwania: %d s", Timer::getInstance().getCurrentTime() - programStartTime);
 
     delete renderer;
     delete simulation;
