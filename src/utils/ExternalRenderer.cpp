@@ -88,11 +88,12 @@ void ExternalRenderer::runBlender(string densityFilePath, int frame) {
 }
 
 void ExternalRenderer::makeVideo(int frames) {
+    string outputVideoFilePath = dataDirectoryWithPrefix + " - " + Config::getInstance()->configDescription + ".mp4";
     string cmd = Config::getInstance()->ffmpegExecutablePath +
                  " -y" +
                  " -loglevel panic" +
                  " -i " + dataDirectoryWithPrefix + "_blender_render_%03d.png" +
-                 " " + dataDirectoryWithPrefix + ".mp4";
+                 " \"" + outputVideoFilePath + "\"";
 
     int code = system(cmd.c_str());
     if (code != 0) {
@@ -100,7 +101,7 @@ void ExternalRenderer::makeVideo(int frames) {
         Logger::getInstance()->error("Błąd komendy:\n%s", cmd.c_str());
         exit(code);
     } else {
-        Logger::getInstance()->info("Film %s.mp4 zmontowany", dataDirectoryWithPrefix.c_str());
+        Logger::getInstance()->info("Film %s zmontowany", outputVideoFilePath.c_str());
     }
 
     removeRenderedFrames(frames);
