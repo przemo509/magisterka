@@ -30,7 +30,7 @@ void ExternalRenderer::dumpDensity(string filePath) {
 
     file.close();
     delete[] out;
-    Logger::getInstance()->info("Utworzono plik do eksportu: %s", filePath.c_str());
+    Logger::getInstance()->debug2("Utworzono plik do eksportu: %s", filePath.c_str());
 }
 
 BYTE *ExternalRenderer::composeOutArray() {

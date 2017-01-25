@@ -7,7 +7,6 @@ using namespace std;
 Timer::Timer() {
     currentFrame = 0;
     framesInSecond = 0;
-    currTime = 0;
     prevTime = 0;
 }
 
@@ -17,7 +16,7 @@ Timer::~Timer() {
 int Timer::incrementFrame() {
     ++currentFrame;
     ++framesInSecond;
-    currTime = time(NULL);
+    long currTime = time(NULL);
     Logger::getInstance()->debug2("Frame: %i", currentFrame);
     long interval = currTime - prevTime;
     if (interval > 1000) {
@@ -29,7 +28,7 @@ int Timer::incrementFrame() {
 }
 
 long Timer::getCurrentTime() {
-    return currTime;
+    return time(NULL);
 }
 
 int Timer::getCurrentFrame() {

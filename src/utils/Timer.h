@@ -27,7 +27,6 @@ private:
 
     int currentFrame;
     int framesInSecond;
-    long currTime;
     long prevTime;
 };
 

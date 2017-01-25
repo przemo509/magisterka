@@ -16,12 +16,15 @@ int main(int argc, char **argv) {
 
     // Klatka nr 1, pusta symulacja.
     int currentFrame = Timer::getInstance().incrementFrame();
+    long frameStartTime = Timer::getInstance().getCurrentTime();
     ExplosionSimulation *simulation = new ExplosionSimulation();
     ExternalRenderer *renderer = new ExternalRenderer(simulation);
     renderer->renderFrame(currentFrame);
+    Logger::getInstance()->info("Klatka %d wygenerowana w %d s", currentFrame, Timer::getInstance().getCurrentTime() - frameStartTime);
 
     while (currentFrame < Config::getInstance()->maxFrames) {
         currentFrame = Timer::getInstance().incrementFrame();
+        frameStartTime = Timer::getInstance().getCurrentTime();
 
         if (currentFrame % Config::getInstance()->framesToSkipRender != 0) {
             continue;
@@ -29,6 +32,7 @@ int main(int argc, char **argv) {
 
         simulation->proceed();
         renderer->renderFrame(currentFrame);
+        Logger::getInstance()->info("Klatka %d wygenerowana w %d s", currentFrame, Timer::getInstance().getCurrentTime() - frameStartTime);
     }
 
     renderer->makeVideo(currentFrame);
