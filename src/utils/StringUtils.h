@@ -52,4 +52,11 @@ static inline string intToString(int i, int width, char padding) {
     return ss.str();
 }
 
+static string formatTime(int seconds) {
+    int h = seconds / 3600;
+    int m = (seconds % 3600) / 60;
+    int s = seconds % 60;
+    return intToString(h, 2, '0') + ":" + intToString(m, 2, '0') + ":" + intToString(s, 2, '0');
+}
+
 #endif //MAGISTERKA_STRINGUTILS_H
