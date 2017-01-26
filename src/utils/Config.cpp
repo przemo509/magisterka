@@ -41,7 +41,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "blenderScenePath") blenderScenePath = value;
         else if (key == "ffmpegExecutablePath") ffmpegExecutablePath = value;
         else if (key == "maxFrames") maxFrames = atoi(value.c_str());
-        else if (key == "verticesCount") verticesCount = atoi(value.c_str());
+        else if (key == "verticesCountFactor") verticesCountFactor = atof(value.c_str());
         else if (key == "vortexStrength") vortexStrength = atof(value.c_str());
         else if (key == "vortexMoving") vortexMoving = atoi(value.c_str());
         else if (key == "vortexRadiusMin") vortexRadiusMin = atof(value.c_str());

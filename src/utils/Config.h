@@ -18,7 +18,7 @@ public:
     const int framesToSkipRender = 1; // 1 żeby renderować wszystkie klatki
 
     const bool simulateTurbulences = true;
-    int verticesCount;
+    float verticesCountFactor;
     float vortexStrength;
     int vortexMoving;
     int vortexRadiusMin;

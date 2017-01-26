@@ -11,15 +11,10 @@ VerticesList::VerticesList(int domainSize, FluidSource *fluidSource) {
 void VerticesList::calculateVerticesDistribution() {
     int frames = fluidSource->maxFrameForVertices;
     verticesDistribution = new int[frames];
-    float velocitySum = 0.0;
-    for (int frame = 0; frame < frames; ++frame) {
-        velocitySum += fluidSource->velocitiesDistribution[frame];
-    }
-    float verticesPerVelocityUnit = Config::getInstance()->verticesCount / velocitySum; // TODO czy to się dobrze podzieli? czy rzutować na float?
 
     float reminder = 0.0;
     for (int frame = 0; frame < frames; ++frame) {
-        float frameVerticesCountFloat = fluidSource->velocitiesDistribution[frame] * verticesPerVelocityUnit + reminder;
+        float frameVerticesCountFloat = fluidSource->velocitiesDistribution[frame] * Config::getInstance()->verticesCountFactor + reminder;
         int frameVerticesCountInt = (int) frameVerticesCountFloat;
         reminder = frameVerticesCountFloat - frameVerticesCountInt;
         verticesDistribution[frame] = frameVerticesCountInt;
