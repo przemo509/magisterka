@@ -23,7 +23,7 @@ void logFrameProcessingTime(int currentFrame, long frameStartTime, long programS
 int main(int argc, char **argv) {
     if (argc != 2) {
         cerr << "Błędne wywołanie, spróbuj tak:";
-        cerr << "%s plik_konfiguracyjny" << argv[0];
+        cerr << "%s plik_konfiguracyjny" << argv[0] << endl;
         exit(EXIT_FAILURE);
     }
 
