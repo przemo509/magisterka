@@ -59,7 +59,7 @@ public:
 
 private:
     const int requiredMainConfigValues = 20;
-    const string mainConfigFilePath = ".\\config.txt";
+    const string mainConfigFilePath = "./config.txt";
 
     static Config *instance;
 

@@ -33,7 +33,7 @@ void Config::readConfig(bool isMain) {
         string value = trim(lineItems[1]);
 
         if (key == "dataDirectory") {
-            dataDirectoryWithPrefix = value + "\\" + configName + "\\" + configName;
+            dataDirectoryWithPrefix = value + "/" + configName + "/" + configName;
             configFilePath = dataDirectoryWithPrefix + ".txt";
             Logger::init(dataDirectoryWithPrefix);
         } else if (key == "blenderExecutablePath") blenderExecutablePath = value;
