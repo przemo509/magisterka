@@ -25,7 +25,7 @@ void Config::readConfig(bool isMain) {
         configDescription = line;
     }
     while (getline(file, line)) {
-        if (line[0] == '#' || line.length() == 0) {
+        if (line.length() == 0 || line[0] == '\n' || line[0] == '\r' || line[0] == '#') {
             continue;
         }
         vector<string> lineItems = split(line, '=');
