@@ -5,8 +5,8 @@
 void logFrameProcessingTime(int currentFrame, long frameStartTime, long programStartTime) {
     // obliczenie szacowanego czasu zakończenia programu
     float percent = 100.0f * currentFrame / Config::getInstance()->maxFrames;
-    long currentTime = Timer::getInstance().getCurrentTime();
-    long runningTime = currentTime - programStartTime;
+    time_t currentTime = Timer::getInstance().getCurrentTime();
+    time_t runningTime = currentTime - programStartTime;
     long estimatedTime = (int) (runningTime * 100.0f / percent - runningTime);
     struct tm *now = localtime(&currentTime);
 
@@ -14,7 +14,7 @@ void logFrameProcessingTime(int currentFrame, long frameStartTime, long programS
                                 intToString(currentFrame, 3, ' ').c_str(),
                                 Config::getInstance()->maxFrames,
                                 intToString((int) percent, 3, ' ').c_str(),
-                                intToString(currentTime - frameStartTime, 3, ' ').c_str(),
+                                intToString((int)(currentTime - frameStartTime), 3, ' ').c_str(),
                                 formatTime(estimatedTime).c_str(),
                                 formatTime((now->tm_hour * 60 + now->tm_min) * 60 + now->tm_sec + estimatedTime).c_str()
     );
