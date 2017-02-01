@@ -34,14 +34,14 @@ void ExternalRenderer::dumpDensity(string filePath) {
 }
 
 BYTE *ExternalRenderer::composeOutArray() {
-    vect3f density = simulation->getDensityArray();
+    float *density = simulation->getDensityArray();
     BYTE *out = new BYTE[cellsCount];
     int outIdx = 0;
 
     for (int j = 0; j < size; ++j) { // zamienione j i k, bo Blender ma w górę oś Z, a ja Y
         for (int k = 0; k < size; ++k) {
             for (int i = 0; i < size; ++i) {
-                int densInt = (int) (255.0 * density[i][j][k]);
+                int densInt = (int) (255.0 * density[I3D(i, j, k)]);
                 BYTE densByte = (BYTE) densInt;
                 if (densInt < 0) {
                     Logger::getInstance()->debug4("Komorka [%d, %d, %d] mniejsza od 0: %d", i, j, k, densInt);
@@ -112,4 +112,8 @@ void ExternalRenderer::removeRenderedFrames(int frames) {
         string frameFilePath = dataDirectoryWithPrefix + "_blender_render_" + intToString(frame, 3, '0') + ".png";
         std::remove(frameFilePath.c_str());
     }
+}
+
+int ExternalRenderer::I3D(int i, int j, int k) {
+    return ExplosionSimulation::I3D(i, j, k);
 }

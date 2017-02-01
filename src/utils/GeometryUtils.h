@@ -3,8 +3,6 @@
 
 #include <cmath>
 
-typedef float ***vect3f;
-
 class Point {
 public:
     float x, y, z;

@@ -1,6 +1,7 @@
 #include "Vortex.h"
 #include "../../utils/MathUtils.h"
 #include "../../utils/Config.h"
+#include "../ExplosionSimulation.h"
 
 Vortex::Vortex(int id, int x, int y, int z, int domainSize) : id(id), domainSize(domainSize) {
     position = Point(x, y, z);
@@ -12,7 +13,7 @@ Vortex::Vortex(int id, int x, int y, int z, int domainSize) : id(id), domainSize
 Vortex::~Vortex() {
 }
 
-void Vortex::apply(vect3f vx, vect3f vy, vect3f vz) {
+void Vortex::apply(float *vx, float *vy, float *vz) {
     for (int k = (int) (position.z - radius); k <= position.z + radius; ++k) {
         if (k < 0) continue;
         if (k >= domainSize) break;
@@ -24,9 +25,10 @@ void Vortex::apply(vect3f vx, vect3f vy, vect3f vz) {
                 if (i >= domainSize) break;
                 Vector windDirection = Vector(position, Point(i, j, k)).crossProduct(direction);
                 windDirection.normalize();
-                vx[i][j][k] += Config::getInstance()->vortexStrength / radius * windDirection.x;
-                vy[i][j][k] += Config::getInstance()->vortexStrength / radius * windDirection.y;
-                vz[i][j][k] += Config::getInstance()->vortexStrength / radius * windDirection.z;
+                int idx3D = I3D(i, j, k);
+                vx[idx3D] += Config::getInstance()->vortexStrength / radius * windDirection.x;
+                vy[idx3D] += Config::getInstance()->vortexStrength / radius * windDirection.y;
+                vz[idx3D] += Config::getInstance()->vortexStrength / radius * windDirection.z;
             }
         }
     }
@@ -34,10 +36,15 @@ void Vortex::apply(vect3f vx, vect3f vy, vect3f vz) {
     int oldX = (int) position.x;
     int oldY = (int) position.y;
     int oldZ = (int) position.z;
-    position.x += Config::getInstance()->vortexMoving * vx[oldX][oldY][oldZ];
-    position.y += Config::getInstance()->vortexMoving * vy[oldX][oldY][oldZ];
-    position.z += Config::getInstance()->vortexMoving * vz[oldX][oldY][oldZ];
+    int oldIdx3D = I3D(oldX, oldY, oldZ);
+    position.x += Config::getInstance()->vortexMoving * vx[oldIdx3D];
+    position.y += Config::getInstance()->vortexMoving * vy[oldIdx3D];
+    position.z += Config::getInstance()->vortexMoving * vz[oldIdx3D];
     framesLived++;
+}
+
+int Vortex::I3D(int i, int j, int k) const {
+    return ExplosionSimulation::I3D(i, j, k);
 }
 
 bool Vortex::shouldBeRemoved() {

@@ -1,13 +1,21 @@
 #include "ExplosionSimulation.h"
 #include "../utils/Config.h"
 #include "../utils/Timer.h"
+#include "wavelet/IMAGE.h"
 
-vect3f ExplosionSimulation::getDensityArray() const {
+float *ExplosionSimulation::getDensityArray() {
     return dens;
 }
 
-int ExplosionSimulation::getArraysSize() const {
+
+int ExplosionSimulation::N = 0;
+
+int ExplosionSimulation::getArraysSize() {
     return N + 2;
+}
+
+int ExplosionSimulation::getArraysSize3D() {
+    return getArraysSize() * getArraysSize() * getArraysSize();
 }
 
 ExplosionSimulation::ExplosionSimulation() {
@@ -20,14 +28,15 @@ ExplosionSimulation::ExplosionSimulation() {
 
     relaxationSteps = Config::getInstance()->relaxationSteps;
 
-    allocate3D(vx);
-    allocate3D(vy);
-    allocate3D(vz);
-    allocate3D(vxPrev);
-    allocate3D(vyPrev);
-    allocate3D(vzPrev);
-    allocate3D(dens);
-    allocate3D(densPrev);
+    int size3D = getArraysSize3D();
+    vx = new float[size3D];
+    vy = new float[size3D];
+    vz = new float[size3D];
+    vxPrev = new float[size3D];
+    vyPrev = new float[size3D];
+    vzPrev = new float[size3D];
+    dens = new float[size3D];
+    densPrev = new float[size3D];
 
     source = new FluidSource(Config::getInstance());
     vertices = new VerticesList(getArraysSize(), source);
@@ -39,40 +48,18 @@ ExplosionSimulation::ExplosionSimulation() {
     setStartingConditions();
 }
 
-void ExplosionSimulation::allocate3D(vect3f &t) {
-    int size = getArraysSize();
-    t = new float **[size];
-    for (int i = 0; i < size; ++i) {
-        t[i] = new float *[size];
-        for (int j = 0; j < size; ++j) {
-            t[i][j] = new float[size];
-        }
-    }
-}
-
 ExplosionSimulation::~ExplosionSimulation() {
-    deallocate3D(vx);
-    deallocate3D(vy);
-    deallocate3D(vz);
-    deallocate3D(vxPrev);
-    deallocate3D(vyPrev);
-    deallocate3D(vzPrev);
-    deallocate3D(dens);
-    deallocate3D(densPrev);
+    delete[] vx;
+    delete[] vy;
+    delete[] vz;
+    delete[] vxPrev;
+    delete[] vyPrev;
+    delete[] vzPrev;
+    delete[] dens;
+    delete[] densPrev;
     delete source;
     delete vertices;
     delete waveletTurbulence;
-}
-
-void ExplosionSimulation::deallocate3D(vect3f &t) {
-    int size = getArraysSize();
-    for (int i = 0; i < size; ++i) {
-        for (int j = 0; j < size; ++j) {
-            delete[] t[i][j];
-        }
-        delete[] t[i];
-    }
-    delete[] t;
 }
 
 void ExplosionSimulation::setStartingConditions() {
@@ -80,20 +67,16 @@ void ExplosionSimulation::setStartingConditions() {
 }
 
 void ExplosionSimulation::clearSpace() {
-    int size = getArraysSize();
-    for (int k = 0; k < size; ++k) {
-        for (int j = 0; j < size; ++j) {
-            for (int i = 0; i < size; ++i) {
-                dens[i][j][k] = 0.0;
-                vx[i][j][k] = 0.0;
-                vy[i][j][k] = 0.0;
-                vz[i][j][k] = 0.0;
-                densPrev[i][j][k] = 0.0;
-                vxPrev[i][j][k] = 0.0;
-                vyPrev[i][j][k] = 0.0;
-                vzPrev[i][j][k] = 0.0;
-            }
-        }
+    int size3D = getArraysSize3D();
+    for (int i = 0; i < size3D; ++i) {
+        dens[i] = 0.0;
+        vx[i] = 0.0;
+        vy[i] = 0.0;
+        vz[i] = 0.0;
+        densPrev[i] = 0.0;
+        vxPrev[i] = 0.0;
+        vyPrev[i] = 0.0;
+        vzPrev[i] = 0.0;
     }
 }
 
@@ -107,7 +90,7 @@ void ExplosionSimulation::proceed() {
     float dx = 1.0f / getArraysSize();
     //_wTurbulence->stepTurbulenceFull(_dt/_dx,
     //		_xVelocity, _yVelocity, _zVelocity, _obstacles);
-    waveletTurbulence->stepTurbulenceReadable(dt / dx, (float *) vx, (float *) vy, (float *) vz, NULL); // TODO zamienić vy z vz? TODO 2 obstacles?
+//    waveletTurbulence->stepTurbulenceReadable(dt / dx, vx, vy, vz, NULL); // TODO zamienić vy z vz? TODO 2 obstacles?
 }
 
 void ExplosionSimulation::addSources() {
@@ -128,10 +111,11 @@ void ExplosionSimulation::addSources() {
                 int di = i - source->positionX;
                 double dd = dt / (sqrt(di * di + dk * dk) + 0.01) * source->density;
                 double dvx = dt * sin(di) * source->spreadFactor;  // na zewnątrz
-                dens[i][j][k] += dd;
-                vx[i][j][k] += dvx;
-                vz[i][j][k] += dvz;
-                vy[i][j][k] += dvy;
+                int idx3D = I3D(i, j, k);
+                dens[idx3D] += dd;
+                vx[idx3D] += dvx;
+                vz[idx3D] += dvz;
+                vy[idx3D] += dvy;
 
                 int amplify = Config::getInstance()->waveletTurbulenceAmplify;
                 int amplifyVolume = amplify * amplify * amplify;
@@ -139,8 +123,7 @@ void ExplosionSimulation::addSources() {
                 for (int wk = k; wk < k + amplify; wk++) {
                     for (int wj = j; wj < j + amplify; wj++) {
                         for (int wi = i; wi < i + amplify; wi++) {
-                            int index = wk * getArraysSize() * getArraysSize() + wj * getArraysSize() + wi;
-                            waveletTurbulence->getDensityBig()[index] += ddPerAmplifyVolume; // TODO zamienić Y i Z? TODO += czy =?
+                            waveletTurbulence->getDensityBig()[I3D(wi, wj, wk)] += ddPerAmplifyVolume; // TODO zamienić Y i Z? TODO += czy =?
                         }
                     }
                 }
@@ -154,10 +137,11 @@ void ExplosionSimulation::addForces() {
     for (int k = 0; k < size; ++k) {
         for (int j = 0; j < size; ++j) {
             for (int i = 0; i < size; ++i) {
-                vy[i][j][k] += dt * (-1.0 * Config::getInstance()->gravityFactor +
-                                     dens[i][j][k] * Config::getInstance()->thermalBuoyancyFactor / (j > 0 ? j : 1));
+                int idx3D = I3D(i, j, k);
+                vy[idx3D] += dt * (-1.0 * Config::getInstance()->gravityFactor +
+                                   dens[idx3D] * Config::getInstance()->thermalBuoyancyFactor / (j > 0 ? j : 1));
                 if (i < 5) {
-                    vx[i][j][k] += dt * Config::getInstance()->windFactor;
+                    vx[idx3D] += dt * Config::getInstance()->windFactor;
                 }
             }
         }
@@ -174,9 +158,9 @@ void ExplosionSimulation::addTurbulences() {
 }
 
 void ExplosionSimulation::calculateVelocities() {
-    std::swap(vxPrev, vx);
-    std::swap(vyPrev, vy);
-    std::swap(vzPrev, vz);
+    SWAP_POINTERS(vxPrev, vx);
+    SWAP_POINTERS(vyPrev, vy);
+    SWAP_POINTERS(vzPrev, vz);
 
     diffuse(X_DIR, viscosity, vx, vxPrev);
     diffuse(Y_DIR, viscosity, vy, vyPrev);
@@ -184,9 +168,9 @@ void ExplosionSimulation::calculateVelocities() {
 
     project(vx, vy, vz, vxPrev, vyPrev);
 
-    std::swap(vxPrev, vx);
-    std::swap(vyPrev, vy);
-    std::swap(vzPrev, vz);
+    SWAP_POINTERS(vxPrev, vx);
+    SWAP_POINTERS(vyPrev, vy);
+    SWAP_POINTERS(vzPrev, vz);
 
     advect(X_DIR, vx, vxPrev, vxPrev, vyPrev, vzPrev);
     advect(Y_DIR, vy, vyPrev, vxPrev, vyPrev, vzPrev);
@@ -195,9 +179,9 @@ void ExplosionSimulation::calculateVelocities() {
 }
 
 void ExplosionSimulation::calculateDensities() {
-    std::swap(densPrev, dens);
+    SWAP_POINTERS(densPrev, dens);
     diffuse(NO_DIR, diffusionRate, dens, densPrev);
-    std::swap(densPrev, dens);
+    SWAP_POINTERS(densPrev, dens);
     advect(NO_DIR, dens, densPrev, vx, vy, vz);
 }
 
@@ -209,16 +193,16 @@ void ExplosionSimulation::calculateDensities() {
 //	for(int k = 1; k <= N; ++k) {
 //		for(int j = 1; j <= N; ++j) {
 //			for(int i = 1; i <= N; ++i) {
-//				x[i][j][k] =
-//						x0[i][j][k] +
+//				x[I3D(i, j, k)] =
+//						x0[I3D(i, j, k)] +
 //						a*(
-//						x0[i-1][j][k] +
-//						x0[i+1][j][k] +
-//						x0[i][j-1][k] +
-//						x0[i][j+1][k] +
-//						x0[i][j][k-1] +
-//						x0[i][j][k+1] -
-//						6 * x0[i][j][k]
+//						x0[I3D(i-1, j, k)] +
+//						x0[I3D(i+1, j, k)] +
+//						x0[I3D(i, j-1, k)] +
+//						x0[I3D(i, j+1, k)] +
+//						x0[I3D(i, j, k-1)] +
+//						x0[I3D(i, j, k+1)] -
+//						6 * x0[I3D(i, j, k)]
 //						);
 //			}
 //		}
@@ -229,16 +213,17 @@ void ExplosionSimulation::calculateDensities() {
 /**
  * stabilna dyfuzja.
  */
-void ExplosionSimulation::diffuse(BoundDirection dir, float factor, vect3f x, vect3f x0) {
+void ExplosionSimulation::diffuse(BoundDirection dir, float factor, float *x, float *x0) {
     float a = dt * factor * N * N;
-    float precomputedDivider = 1.0 + 6.0 * a;
+    float precomputedDivider = 1.0f + 6.0f * a;
     for (int step = 0; step < relaxationSteps; ++step) {
         for (int k = 1; k <= N; ++k) {
             for (int j = 1; j <= N; j++) {
                 for (int i = 1; i <= N; i++) {
-                    x[i][j][k] = (x0[i][j][k] + a * (x[i - 1][j][k] + x[i + 1][j][k] + x[i][j - 1][k] + x[i][j + 1][k] +
-                                                     x[i][j][k - 1] + x[i][j][k + 1]))
-                                 / precomputedDivider;
+                    x[I3D(i, j, k)] =
+                            (x0[I3D(i, j, k)] + a * (x[I3D(i - 1, j, k)] + x[I3D(i + 1, j, k)] +
+                                                       x[I3D(i, j - 1, k)] + x[I3D(i, j + 1, k)] +
+                                                       x[I3D(i, j, k - 1)] + x[I3D(i, j, k + 1)])) / precomputedDivider;
                 }
             }
         }
@@ -246,7 +231,7 @@ void ExplosionSimulation::diffuse(BoundDirection dir, float factor, vect3f x, ve
     }
 }
 
-void ExplosionSimulation::setBoundaries(BoundDirection dir, vect3f x) {
+void ExplosionSimulation::setBoundaries(BoundDirection dir, float *x) {
     int xSign = dir == X_DIR ? -1 : 1;
     int ySign = dir == Y_DIR ? -1 : 1;
     int zSign = dir == Z_DIR ? -1 : 1;
@@ -255,59 +240,59 @@ void ExplosionSimulation::setBoundaries(BoundDirection dir, vect3f x) {
     for (int i = 1; i <= N; ++i) {
         for (int j = 1; j <= N; ++j) {
             // przednia
-            x[i][j][0] = zSign * x[i][j][1];
+            x[I3D(i, j, 0)] = zSign * x[I3D(i, j, 1)];
             // tylna
-            x[i][j][N + 1] = zSign * x[i][j][N];
+            x[I3D(i, j, N + 1)] = zSign * x[I3D(i, j, N)];
             // lewa
-            x[0][i][j] = xSign * x[1][i][j];
+            x[I3D(0, i, j)] = xSign * x[I3D(1, i, j)];
             // prawa
-            x[N + 1][i][j] = xSign * x[N][i][j];
+            x[I3D(N + 1, i, j)] = xSign * x[I3D(N, i, j)];
             // dolna
-            x[i][0][j] = ySign * x[i][1][j];
+            x[I3D(i, 0, j)] = ySign * x[I3D(i, 1, j)];
             // górna
-            x[i][N + 1][j] = ySign * x[i][N][j];
+            x[I3D(i, N + 1, j)] = ySign * x[I3D(i, N, j)];
         }
     }
 
     // krawędzie (12)
     for (int i = 1; i <= N; ++i) {
         // pionowo
-        x[0][i][0] = (x[1][i][0] + x[0][i][1]) / 2;
-        x[N + 1][i][0] = (x[N][i][0] + x[N + 1][i][1]) / 2;
-        x[0][i][N + 1] = (x[1][i][N + 1] + x[0][i][N]) / 2;
-        x[N + 1][i][N + 1] = (x[N][i][N + 1] + x[N + 1][i][N]) / 2;
+        x[I3D(0, i, 0)] = (x[I3D(1, i, 0)] + x[I3D(0, i, 1)]) / 2;
+        x[I3D(N + 1, i, 0)] = (x[I3D(N, i, 0)] + x[I3D(N + 1, i, 1)]) / 2;
+        x[I3D(0, i, N + 1)] = (x[I3D(1, i, N + 1)] + x[I3D(0, i, N)]) / 2;
+        x[I3D(N + 1, i, N + 1)] = (x[I3D(N, i, N + 1)] + x[I3D(N + 1, i, N)]) / 2;
 
         // wszerz
-        x[i][0][0] = (x[i][1][0] + x[i][0][1]) / 2;
-        x[i][N + 1][0] = (x[i][N][0] + x[i][N + 1][1]) / 2;
-        x[i][0][N + 1] = (x[i][1][N + 1] + x[i][0][N]) / 2;
-        x[i][N + 1][N + 1] = (x[i][N][N + 1] + x[i][N + 1][N]) / 2;
+        x[I3D(i, 0, 0)] = (x[I3D(i, 1, 0)] + x[I3D(i, 0, 1)]) / 2;
+        x[I3D(i, N + 1, 0)] = (x[I3D(i, N, 0)] + x[I3D(i, N + 1, 1)]) / 2;
+        x[I3D(i, 0, N + 1)] = (x[I3D(i, 1, N + 1)] + x[I3D(i, 0, N)]) / 2;
+        x[I3D(i, N + 1, N + 1)] = (x[I3D(i, N, N + 1)] + x[I3D(i, N + 1, N)]) / 2;
 
         // wgłąb
-        x[0][0][i] = (x[1][0][i] + x[0][1][i]) / 2;
-        x[N + 1][0][i] = (x[N][0][i] + x[N + 1][1][i]) / 2;
-        x[0][N + 1][i] = (x[1][N + 1][i] + x[0][N][i]) / 2;
-        x[N + 1][N + 1][i] = (x[N][N + 1][i] + x[N + 1][N][i]) / 2;
+        x[I3D(0, 0, i)] = (x[I3D(1, 0, i)] + x[I3D(0, 1, i)]) / 2;
+        x[I3D(N + 1, 0, i)] = (x[I3D(N, 0, i)] + x[I3D(N + 1, 1, i)]) / 2;
+        x[I3D(0, N + 1, i)] = (x[I3D(1, N + 1, i)] + x[I3D(0, N, i)]) / 2;
+        x[I3D(N + 1, N + 1, i)] = (x[I3D(N, N + 1, i)] + x[I3D(N + 1, N, i)]) / 2;
     }
 
     // narożniki (8)
-    x[0][0][0] = (x[1][0][0] + x[0][1][0] + x[0][0][1]) / 3;
-    x[0][0][N + 1] = (x[1][0][N + 1] + x[0][1][N + 1] + x[0][0][N]) / 3;
-    x[0][N + 1][0] = (x[1][N + 1][0] + x[0][N][0] + x[0][N + 1][1]) / 3;
-    x[0][N + 1][N + 1] = (x[1][N + 1][N + 1] + x[0][N][N + 1] + x[0][N + 1][N]) / 3;
-    x[N + 1][0][0] = (x[N][0][0] + x[N + 1][1][0] + x[N + 1][0][1]) / 3;
-    x[N + 1][0][N + 1] = (x[N][0][N + 1] + x[N + 1][1][N + 1] + x[N + 1][0][N]) / 3;
-    x[N + 1][N + 1][0] = (x[N][N + 1][0] + x[N + 1][N][0] + x[N + 1][N + 1][1]) / 3;
-    x[N + 1][N + 1][N + 1] = (x[N][N + 1][N + 1] + x[N + 1][N][N + 1] + x[N + 1][N + 1][N]) / 3;
+    x[I3D(0, 0, 0)] = (x[I3D(1, 0, 0)] + x[I3D(0, 1, 0)] + x[I3D(0, 0, 1)]) / 3;
+    x[I3D(0, 0, N + 1)] = (x[I3D(1, 0, N + 1)] + x[I3D(0, 1, N + 1)] + x[I3D(0, 0, N)]) / 3;
+    x[I3D(0, N + 1, 0)] = (x[I3D(1, N + 1, 0)] + x[I3D(0, N, 0)] + x[I3D(0, N + 1, 1)]) / 3;
+    x[I3D(0, N + 1, N + 1)] = (x[I3D(1, N + 1, N + 1)] + x[I3D(0, N, N + 1)] + x[I3D(0, N + 1, N)]) / 3;
+    x[I3D(N + 1, 0, 0)] = (x[I3D(N, 0, 0)] + x[I3D(N + 1, 1, 0)] + x[I3D(N + 1, 0, 1)]) / 3;
+    x[I3D(N + 1, 0, N + 1)] = (x[I3D(N, 0, N + 1)] + x[I3D(N + 1, 1, N + 1)] + x[I3D(N + 1, 0, N)]) / 3;
+    x[I3D(N + 1, N + 1, 0)] = (x[I3D(N, N + 1, 0)] + x[I3D(N + 1, N, 0)] + x[I3D(N + 1, N + 1, 1)]) / 3;
+    x[I3D(N + 1, N + 1, N + 1)] = (x[I3D(N, N + 1, N + 1)] + x[I3D(N + 1, N, N + 1)] + x[I3D(N + 1, N + 1, N)]) / 3;
 }
 
-void ExplosionSimulation::project(vect3f u, vect3f v, vect3f w, vect3f p, vect3f div) {
+void ExplosionSimulation::project(float *u, float *v, float *w, float *p, float *div) {
     for (int k = 1; k <= N; ++k) {
         for (int j = 1; j <= N; ++j) {
             for (int i = 1; i <= N; ++i) {
-                div[i][j][k] = -(u[i + 1][j][k] - u[i - 1][j][k] + v[i][j + 1][k] - v[i][j - 1][k] + w[i][j][k + 1] -
-                                 w[i][j][k - 1]) / 3.0 / N;
-                p[i][j][k] = 0.0;
+                div[I3D(i, j, k)] = -(u[I3D(i + 1, j, k)] - u[I3D(i - 1, j, k)] + v[I3D(i, j + 1, k)] - v[I3D(i, j - 1, k)] + w[I3D(i, j, k + 1)] -
+                                        w[I3D(i, j, k - 1)]) / 3.0f / N;
+                p[I3D(i, j, k)] = 0.0;
             }
         }
     }
@@ -318,8 +303,8 @@ void ExplosionSimulation::project(vect3f u, vect3f v, vect3f w, vect3f p, vect3f
         for (int k = 1; k <= N; ++k) {
             for (int j = 1; j <= N; ++j) {
                 for (int i = 1; i <= N; ++i) {
-                    p[i][j][k] = (div[i][j][k] + p[i - 1][j][k] + p[i + 1][j][k] + p[i][j - 1][k] + p[i][j + 1][k] +
-                                  p[i][j][k - 1] + p[i][j][k + 1]) / 6.0;
+                    p[I3D(i, j, k)] = (div[I3D(i, j, k)] + p[I3D(i - 1, j, k)] + p[I3D(i + 1, j, k)] + p[I3D(i, j - 1, k)] + p[I3D(i, j + 1, k)] +
+                                         p[I3D(i, j, k - 1)] + p[I3D(i, j, k + 1)]) / 6.0f;
                 }
             }
         }
@@ -329,9 +314,10 @@ void ExplosionSimulation::project(vect3f u, vect3f v, vect3f w, vect3f p, vect3f
     for (int k = 1; k <= N; ++k) {
         for (int j = 1; j <= N; ++j) {
             for (int i = 1; i <= N; ++i) {
-                u[i][j][k] -= (p[i + 1][j][k] - p[i - 1][j][k]) / 2.0 * N;
-                v[i][j][k] -= (p[i][j + 1][k] - p[i][j - 1][k]) / 2.0 * N;
-                w[i][j][k] -= (p[i][j][k + 1] - p[i][j][k - 1]) / 2.0 * N;
+                int idx3D = I3D(i, j, k);
+                u[idx3D] -= (p[I3D(i + 1, j, k)] - p[I3D(i - 1, j, k)]) / 2.0f * N;
+                v[idx3D] -= (p[I3D(i, j + 1, k)] - p[I3D(i, j - 1, k)]) / 2.0f * N;
+                w[idx3D] -= (p[I3D(i, j, k + 1)] - p[I3D(i, j, k - 1)]) / 2.0f * N;
             }
         }
     }
@@ -340,29 +326,30 @@ void ExplosionSimulation::project(vect3f u, vect3f v, vect3f w, vect3f p, vect3f
     setBoundaries(Z_DIR, w);
 }
 
-void ExplosionSimulation::advect(BoundDirection dir, vect3f d, vect3f d0, vect3f u, vect3f v, vect3f w) {
+void ExplosionSimulation::advect(BoundDirection dir, float *d, float *d0, float *u, float *v, float *w) {
     for (int k = 1; k <= N; ++k) {
         for (int j = 1; j <= N; ++j) {
             for (int i = 1; i <= N; ++i) {
                 // i, j, k - współrzędne komórki, dla której liczymy nowe dane
                 // x, y, z - współrzędne punktu, z którego przyszły dane idąc wstecz po wektorze prędkości (nie pokrywa się z żadną komórką 1:1)
-                float x = i - dt * N * u[i][j][k];
-                float y = j - dt * N * v[i][j][k];
-                float z = k - dt * N * w[i][j][k];
+                int idx3D = I3D(i, j, k);
+                float x = i - dt * N * u[idx3D];
+                float y = j - dt * N * v[idx3D];
+                float z = k - dt * N * w[idx3D];
 
                 // pilnujemy przekraczania granic podczas szukania
-                if (x < 0.5)
-                    x = 0.5;
-                if (x > N + 0.5)
-                    x = N + 0.5;
-                if (y < 0.5)
-                    y = 0.5;
-                if (y > N + 0.5)
-                    y = N + 0.5;
-                if (z < 0.5)
-                    z = 0.5;
-                if (z > N + 0.5)
-                    z = N + 0.5;
+                if (x < 0.5f)
+                    x = 0.5f;
+                if (x > N + 0.5f)
+                    x = N + 0.5f;
+                if (y < 0.5f)
+                    y = 0.5f;
+                if (y > N + 0.5f)
+                    y = N + 0.5f;
+                if (z < 0.5f)
+                    z = 0.5f;
+                if (z > N + 0.5f)
+                    z = N + 0.5f;
 
                 // współrzędne ośmiu najbliższych komórek (kostka 2x2x2)
                 int i0 = (int) x;
@@ -381,18 +368,22 @@ void ExplosionSimulation::advect(BoundDirection dir, vect3f d, vect3f d0, vect3f
                 float t0 = 1 - t1;
 
                 // obliczenie wynikowej wartości w komórce [i][j][k]
-                d[i][j][k] =
-                        r0 * s0 * t0 * d0[i0][j0][k0] +
-                        r0 * s0 * t1 * d0[i0][j0][k1] +
-                        r0 * s1 * t0 * d0[i0][j1][k0] +
-                        r0 * s1 * t1 * d0[i0][j1][k1] +
-                        r1 * s0 * t0 * d0[i1][j0][k0] +
-                        r1 * s0 * t1 * d0[i1][j0][k1] +
-                        r1 * s1 * t0 * d0[i1][j1][k0] +
-                        r1 * s1 * t1 * d0[i1][j1][k1];
+                d[idx3D] =
+                        r0 * s0 * t0 * d0[I3D(i0, j0, k0)] +
+                        r0 * s0 * t1 * d0[I3D(i0, j0, k1)] +
+                        r0 * s1 * t0 * d0[I3D(i0, j1, k0)] +
+                        r0 * s1 * t1 * d0[I3D(i0, j1, k1)] +
+                        r1 * s0 * t0 * d0[I3D(i1, j0, k0)] +
+                        r1 * s0 * t1 * d0[I3D(i1, j0, k1)] +
+                        r1 * s1 * t0 * d0[I3D(i1, j1, k0)] +
+                        r1 * s1 * t1 * d0[I3D(i1, j1, k1)];
 
             }
         }
     }
     setBoundaries(dir, d);
+}
+
+int ExplosionSimulation::I3D(int i, int j, int k) {
+    return i * getArraysSize() * getArraysSize() + j * getArraysSize() + k;
 }

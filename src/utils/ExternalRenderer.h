@@ -30,6 +30,8 @@ private:
     void runBlender(string densityFilePath, int i);
 
     void removeRenderedFrames(int frames);
+
+    int I3D(int i, int j, int k);
 };
 
 

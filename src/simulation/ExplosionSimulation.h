@@ -18,15 +18,21 @@ public:
     virtual ~ExplosionSimulation();
 
     void proceed();
-    vect3f getDensityArray() const;
-    int getArraysSize() const;
+
+    float *getDensityArray();
+
+    static int getArraysSize();
+
+    static int getArraysSize3D();
 
     void setStartingConditions();
 
+    static int I3D(int i, int j, int k);
+
 private:
-    int N;
-    vect3f vxPrev, vyPrev, vzPrev, vx, vy, vz;
-    vect3f densPrev, dens;
+    static int N;
+    float *vxPrev, *vyPrev, *vzPrev, *vx, *vy, *vz;
+    float *densPrev, *dens;
     float dt, viscosity, diffusionRate;
     int relaxationSteps;
 
@@ -37,17 +43,13 @@ private:
 
     void calculateDensities();
 
-    void setBoundaries(BoundDirection dir, vect3f x);
+    void setBoundaries(BoundDirection dir, float *x);
 
-    void project(vect3f u, vect3f v, vect3f w, vect3f p, vect3f div);
+    void project(float *u, float *v, float *w, float *p, float *div);
 
-    void advect(BoundDirection dir, vect3f d, vect3f d0, vect3f u, vect3f v, vect3f w);
+    void advect(BoundDirection dir, float *d, float *d0, float *u, float *v, float *w);
 
-    void diffuse(BoundDirection dir, float factor, vect3f x, vect3f x0);
-
-    void allocate3D(vect3f &what);
-
-    void deallocate3D(vect3f &what);
+    void diffuse(BoundDirection dir, float factor, float *x, float *x0);
 
     void addSources();
 

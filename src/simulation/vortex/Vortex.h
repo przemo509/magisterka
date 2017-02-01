@@ -10,7 +10,7 @@ public:
 
     virtual ~Vortex();
 
-    void apply(vect3f vx, vect3f vy, vect3f vz);
+    void apply(float *vx, float *vy, float *vz);
 
 private:
     static const int vortexRemovalBorder = 5; // TODO zbadać rózne ustawienia
@@ -27,6 +27,8 @@ private:
     bool isBehindBorder(int border);
 
     friend class VerticesList;
+
+    int I3D(int i, int j, int k) const;
 };
 
 #endif //MAGISTERKA_VORTEX_H

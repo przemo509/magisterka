@@ -11,7 +11,7 @@ class VerticesList : public LinkedList {
 public:
     VerticesList(int domainSize, FluidSource *source);
 
-    void applyAll(vect3f vx, vect3f vy, vect3f vz);
+    void applyAll(float *vx, float *vy, float *vz);
 
     void addNewVertices();
 

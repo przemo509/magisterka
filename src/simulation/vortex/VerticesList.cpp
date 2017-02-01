@@ -25,7 +25,7 @@ VerticesList::~VerticesList() {
     delete[] verticesDistribution;
 }
 
-void VerticesList::applyAll(vect3f vx, vect3f vy, vect3f vz) {
+void VerticesList::applyAll(float *vx, float *vy, float *vz) {
     Vortex *tmp = (Vortex *) getFirst();
     while (tmp != NULL) {
         tmp->apply(vx, vy, vz);
