@@ -61,6 +61,8 @@ private:
 
     friend class ExternalRenderer;
 
+    unsigned char *obstacles;
+
     WTURBULENCE *waveletTurbulence;
 };
 

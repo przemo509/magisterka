@@ -2,6 +2,7 @@
 #include "../utils/Config.h"
 #include "../utils/Timer.h"
 #include "wavelet/IMAGE.h"
+#include "wavelet/OBSTACLE.h"
 
 float *ExplosionSimulation::getDensityArray() {
     return dens;
@@ -37,12 +38,11 @@ ExplosionSimulation::ExplosionSimulation() {
     vzPrev = new float[size3D];
     dens = new float[size3D];
     densPrev = new float[size3D];
+    obstacles = new unsigned char[size3D];
 
     source = new FluidSource(Config::getInstance());
     vertices = new VerticesList(getArraysSize(), source);
 
-
-    // initialize wavelet turbulence
     waveletTurbulence = new WTURBULENCE(getArraysSize(), getArraysSize(), getArraysSize(), Config::getInstance()->waveletTurbulenceAmplify);
 
     setStartingConditions();
@@ -57,6 +57,7 @@ ExplosionSimulation::~ExplosionSimulation() {
     delete[] vzPrev;
     delete[] dens;
     delete[] densPrev;
+    delete[] obstacles;
     delete source;
     delete vertices;
     delete waveletTurbulence;
@@ -77,6 +78,7 @@ void ExplosionSimulation::clearSpace() {
         vxPrev[i] = 0.0;
         vyPrev[i] = 0.0;
         vzPrev[i] = 0.0;
+        obstacles[i] = EMPTY;
     }
 }
 
@@ -90,7 +92,7 @@ void ExplosionSimulation::proceed() {
     float dx = 1.0f / getArraysSize();
     //_wTurbulence->stepTurbulenceFull(_dt/_dx,
     //		_xVelocity, _yVelocity, _zVelocity, _obstacles);
-//    waveletTurbulence->stepTurbulenceReadable(dt / dx, vx, vy, vz, NULL); // TODO zamienić vy z vz? TODO 2 obstacles?
+    waveletTurbulence->stepTurbulenceReadable(dt / dx, vx, vy, vz, obstacles); // TODO zamienić vy z vz?
 }
 
 void ExplosionSimulation::addSources() {
