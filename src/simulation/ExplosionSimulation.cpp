@@ -32,6 +32,10 @@ ExplosionSimulation::ExplosionSimulation() {
     source = new FluidSource(Config::getInstance());
     vertices = new VerticesList(getArraysSize(), source);
 
+
+    // initialize wavelet turbulence
+    waveletTurbulence = new WTURBULENCE(getArraysSize(), getArraysSize(), getArraysSize(), Config::getInstance()->waveletTurbulenceAmplify);
+
     setStartingConditions();
 }
 
@@ -57,6 +61,7 @@ ExplosionSimulation::~ExplosionSimulation() {
     deallocate3D(densPrev);
     delete source;
     delete vertices;
+    delete waveletTurbulence;
 }
 
 void ExplosionSimulation::deallocate3D(vect3f &t) {
@@ -98,6 +103,11 @@ void ExplosionSimulation::proceed() {
     addTurbulences();
     calculateVelocities();
     calculateDensities();
+
+    float dx = 1.0f / getArraysSize();
+    //_wTurbulence->stepTurbulenceFull(_dt/_dx,
+    //		_xVelocity, _yVelocity, _zVelocity, _obstacles);
+    waveletTurbulence->stepTurbulenceReadable(dt / dx, (float *) vx, (float *) vy, (float *) vz, NULL); // TODO zamienić vy z vz? TODO 2 obstacles?
 }
 
 void ExplosionSimulation::addSources() {
@@ -122,6 +132,18 @@ void ExplosionSimulation::addSources() {
                 vx[i][j][k] += dvx;
                 vz[i][j][k] += dvz;
                 vy[i][j][k] += dvy;
+
+                int amplify = Config::getInstance()->waveletTurbulenceAmplify;
+                int amplifyVolume = amplify * amplify * amplify;
+                double ddPerAmplifyVolume = dd / amplifyVolume;
+                for (int wk = k; wk < k + amplify; wk++) {
+                    for (int wj = j; wj < j + amplify; wj++) {
+                        for (int wi = i; wi < i + amplify; wi++) {
+                            int index = wk * getArraysSize() * getArraysSize() + wj * getArraysSize() + wi;
+                            waveletTurbulence->getDensityBig()[index] += ddPerAmplifyVolume; // TODO zamienić Y i Z? TODO += czy =?
+                        }
+                    }
+                }
             }
         }
     }

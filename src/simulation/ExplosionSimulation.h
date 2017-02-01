@@ -5,6 +5,7 @@
 #include "vortex/Vortex.h"
 #include "vortex/VerticesList.h"
 #include "source/FluidSource.h"
+#include "wavelet/WTURBULENCE.h"
 
 enum BoundDirection {
     X_DIR, Y_DIR, Z_DIR, NO_DIR
@@ -58,6 +59,7 @@ private:
 
     friend class ExternalRenderer;
 
+    WTURBULENCE *waveletTurbulence;
 };
 
 #endif //MAGISTERKA_EXPLOSIONSIMULATION_H
