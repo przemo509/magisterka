@@ -8,11 +8,6 @@
 #include "Logger.h"
 #include "StringUtils.h"
 
-extern "C"
-{
-#include "lib/snprintf/snprintf.h"
-}
-
 using namespace std;
 
 Logger *Logger::instance;
