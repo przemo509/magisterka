@@ -10,6 +10,8 @@ public:
     LinkedListNode() {
         prev = next = NULL;
     }
+
+    virtual ~LinkedListNode() {}
 };
 
 #endif //MAGISTERKA_LINKEDLISTNODE_H
