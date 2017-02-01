@@ -146,7 +146,6 @@ WTURBULENCE::~WTURBULENCE() {
     delete[] _bigUx;
     delete[] _bigUy;
     delete[] _bigUz;
-    delete[] _tempBig2;
     delete[] _tempBig1;
     delete[] _tempBig2;
 
