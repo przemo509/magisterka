@@ -204,19 +204,12 @@ void FLUID_3D::step() {
                                              _xVelocity, _yVelocity, _zVelocity, _obstacles);
     }
 
-    float *src = _density;
-    string prefix = string("./original.preview/density_fullxy_");
-    writeImageSliceXY(src, _res, _res[2] / 2, prefix, _totalSteps);
-
     // artificial damping -- this is necessary because we use a
     // collated grid, and at very coarse grid resolutions, banding
     // artifacts can occur
     artificialDamping(_xVelocity);
     artificialDamping(_yVelocity);
     artificialDamping(_zVelocity);
-
-    string pbrtPrefix = string("./pbrt/density_small_");
-//    IMAGE::dumpPBRT(_totalSteps, pbrtPrefix, _density, _res[0], _res[1], _res[2]);
 
     _totalTime += _dt;
     _totalSteps++;

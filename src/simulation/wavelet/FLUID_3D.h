@@ -182,15 +182,6 @@ public:
 
     static void clampOutsideRays(const float dt, const float *xVelocity, const float *yVelocity, const float *zVelocity,
                                  float *oldField, float *newField, Vec3Int res, const float *obstacles, const float *oldAdvection);
-
-    // output helper functions
-    static void writeImageSliceXY(const float *field, Vec3Int res, int slice, string prefix, int picCnt, float scale = 1.);
-
-    static void writeImageSliceYZ(const float *field, Vec3Int res, int slice, string prefix, int picCnt, float scale = 1.);
-
-    static void writeImageSliceXZ(const float *field, Vec3Int res, int slice, string prefix, int picCnt, float scale = 1.);
-
-    static void writeProjectedIntern(const float *field, Vec3Int res, int dir1, int dir2, string prefix, int picCnt, float scale = 1.);
 };
 
 #endif

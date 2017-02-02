@@ -661,14 +661,6 @@ void WTURBULENCE::stepTurbulenceReadable(float dtOrg, float *xvel, float *yvel, 
     // eigenvalues stored do not reflect the underlying texture coordinates
     resetTextureCoordinates();
 
-    // output files
-    string prefix = string("./amplified.preview/density_bigxy_");
-    FLUID_3D::writeImageSliceXY(_densityBig, _resBig, _resBig[2] / 2, prefix, _totalStepsBig, 1.0f);
-    //string df3Prefix = string("./df3/density_big_");
-    //IMAGE::dumpDF3(_totalStepsBig, df3Prefix, _densityBig, _resBig[0],_resBig[1],_resBig[2]);
-    string pbrtPrefix = string("./pbrt/density_big_");
-//    IMAGE::dumpPBRT(_totalStepsBig, pbrtPrefix, _densityBig, _resBig[0], _resBig[1], _resBig[2]);
-
     _totalStepsBig++;
 }
 
@@ -883,14 +875,6 @@ void WTURBULENCE::stepTurbulenceFull(float dtOrg, float *xvel, float *yvel, floa
     // Shouldn't do this before generating the noise because then the
     // eigenvalues stored do not reflect the underlying texture coordinates
     resetTextureCoordinates();
-
-    // output files
-    string prefix = string("./amplified.preview/density_bigxy_");
-    FLUID_3D::writeImageSliceXY(_densityBig, _resBig, _resBig[2] / 2, prefix, _totalStepsBig, 1.0f);
-    //string df3prefix = string("./df3/density_big_");
-    //IMAGE::dumpDF3(_totalStepsBig, df3prefix, _densityBig, _resBig[0],_resBig[1],_resBig[2]);
-    string pbrtPrefix = string("./pbrt/density_big_");
-//    IMAGE::dumpPBRT(_totalStepsBig, pbrtPrefix, _densityBig, _resBig[0], _resBig[1], _resBig[2]);
 
     _totalStepsBig++;
 }

@@ -563,21 +563,6 @@ void FLUID_3D::clampOutsideRays(const float dt, const float *velx, const float *
 }
 
 //////////////////////////////////////////////////////////////////////
-// image output
-//////////////////////////////////////////////////////////////////////
-void FLUID_3D::writeImageSliceXY(const float *field, Vec3Int res, int slice, string prefix, int picCnt, float scale) {
-    writeProjectedIntern(field, res, 0, 1, prefix, picCnt, scale);
-}
-
-void FLUID_3D::writeImageSliceYZ(const float *field, Vec3Int res, int slice, string prefix, int picCnt, float scale) {
-    writeProjectedIntern(field, res, 1, 2, prefix, picCnt, scale);
-}
-
-void FLUID_3D::writeImageSliceXZ(const float *field, Vec3Int res, int slice, string prefix, int picCnt, float scale) {
-    writeProjectedIntern(field, res, 0, 2, prefix, picCnt, scale);
-}
-
-//////////////////////////////////////////////////////////////////////
 // Helper function for projecting densities along a dimension
 //////////////////////////////////////////////////////////////////////
 static int getOtherDir(int dir1, int dir2) {
@@ -607,34 +592,4 @@ static int getOtherDir(int dir1, int dir2) {
             }
             break;
     }
-}
-
-//////////////////////////////////////////////////////////////////////
-// average densities along third spatial direction
-//////////////////////////////////////////////////////////////////////
-void FLUID_3D::writeProjectedIntern(const float *field, Vec3Int res,
-                                    int dir1, int dir2, string prefix, int picCnt, float scale) {
-    const int nitems = res[dir1] * res[dir2];
-    const int otherDir = getOtherDir(dir1, dir2);
-    float *buf = new float[nitems];
-    Vec3Int min = Vec3Int(0);
-    Vec3Int max = res;
-
-    min[otherDir] = 0;
-    max[otherDir] = res[otherDir];
-    float div = 1. / (float) MIN3V(res); // normalize for shorter sides, old: res[otherDir];
-    div *= 4.; //slightly increase contrast
-    for (int i = 0; i < nitems; i++) buf[i] = 0.;
-
-    Vec3Int cnt = 0;
-    for (cnt[2] = min[2]; cnt[2] < max[2]; cnt[2]++) {
-        for (cnt[1] = min[1]; cnt[1] < max[1]; cnt[1]++)
-            for (cnt[0] = min[0]; cnt[0] < max[0]; cnt[0]++) {
-                const int index = cnt[0] + cnt[1] * res[0] + cnt[2] * res[0] * res[1];
-                const int bufindex = cnt[dir1] + cnt[dir2] * res[dir1];
-                buf[bufindex] += field[index] * scale * div;
-            }
-    }
-//    IMAGE::dumpNumberedPNG(picCnt, prefix, buf, res[dir1], res[dir2]);
-    delete[] buf;
 }
