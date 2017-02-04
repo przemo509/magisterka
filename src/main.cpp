@@ -14,7 +14,7 @@ void logFrameProcessingTime(int currentFrame, long frameStartTime, long programS
                                 intToString(currentFrame, 3, ' ').c_str(),
                                 Config::getInstance()->maxFrames,
                                 intToString((int) percent, 3, ' ').c_str(),
-                                intToString((int)(currentTime - frameStartTime), 3, ' ').c_str(),
+                                intToString((int) (currentTime - frameStartTime), 3, ' ').c_str(),
                                 formatTime(estimatedTime).c_str(),
                                 formatTime((now->tm_hour * 60 + now->tm_min) * 60 + now->tm_sec + estimatedTime).c_str()
     );
@@ -58,7 +58,9 @@ int main(int argc, char **argv) {
     renderer->makeVideo(currentFrame);
 
     Logger::getInstance()->info("Koniec przetwarzania %s", configName.c_str());
-    Logger::getInstance()->info("Czas trwania: %s", formatTime(Timer::getInstance().getCurrentTime() - programStartTime).c_str());
+    long totalElapsedTime = Timer::getInstance().getCurrentTime() - programStartTime;
+    Logger::getInstance()->info("Całkowity czas trwania: %s", formatTime(totalElapsedTime).c_str());
+    Logger::getInstance()->info("Czas trwania na klatkę (średnio): %s", formatTime(totalElapsedTime / currentFrame).c_str());
 
     delete renderer;
     delete simulation;
