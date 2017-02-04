@@ -5,19 +5,23 @@
 ExternalRenderer::ExternalRenderer(ExplosionSimulation *simulation) {
     dataDirectoryWithPrefix = Config::getInstance()->dataDirectoryWithPrefix;
     this->simulation = simulation;
-    size = this->simulation->getArraysSize();
-    cellsCount = size * size * size;
 }
 
 void ExternalRenderer::renderFrame(int frame) {
-    string densityFilePath = dataDirectoryWithPrefix + "_density_" + intToString(frame, 3, '0') + ".raw";
+    string densityFilePath = dataDirectoryWithPrefix + "_density_small_" + intToString(frame, 3, '0') + ".raw";
+    int size = simulation->getArraysSize();
+    dumpDensity(densityFilePath, simulation->getDensityArray(), size);
+    runBlender(densityFilePath, "small", frame, size);
+    std::remove(densityFilePath.c_str());
 
-    dumpDensity(densityFilePath);
-    runBlender(densityFilePath, frame);
+    densityFilePath = dataDirectoryWithPrefix + "_density_big_" + intToString(frame, 3, '0') + ".raw";
+    size = simulation->waveletTurbulence->getResBig().x; //TODO różne wymiary x, y, z
+    dumpDensity(densityFilePath, simulation->waveletTurbulence->getDensityBig(), size);
+    runBlender(densityFilePath, "big", frame, size);
     std::remove(densityFilePath.c_str());
 }
 
-void ExternalRenderer::dumpDensity(string filePath) {
+void ExternalRenderer::dumpDensity(string filePath, float *density, int size) {
     ofstream file(filePath, ios::binary | ios::out);
     if (!file.is_open()) {
         Logger::getInstance()->error("Blad otwarcia pliku [%s]. Szczegoly:\nkod=[%d]\nkomunikat=[%s]\n\nKoncze prace!",
@@ -25,23 +29,22 @@ void ExternalRenderer::dumpDensity(string filePath) {
         exit(EXIT_FAILURE);
     }
 
-    BYTE *out = composeOutArray();
-    file.write((char *) out, cellsCount);
+    BYTE *out = composeOutArray(density, size);
+    file.write((char *) out, size * size * size);
 
     file.close();
     delete[] out;
     Logger::getInstance()->debug2("Utworzono plik do eksportu: %s", filePath.c_str());
 }
 
-BYTE *ExternalRenderer::composeOutArray() {
-    float *density = simulation->getDensityArray();
-    BYTE *out = new BYTE[cellsCount];
+BYTE *ExternalRenderer::composeOutArray(float *density, int size) {
+    BYTE *out = new BYTE[size * size * size];
     int outIdx = 0;
 
     for (int j = 0; j < size; ++j) { // zamienione j i k, bo Blender ma w górę oś Z, a ja Y
         for (int k = 0; k < size; ++k) {
             for (int i = 0; i < size; ++i) {
-                int densInt = (int) (255.0 * density[I3D(i, j, k)]);
+                int densInt = (int) (255.0 * density[I3D(i, j, k, size)]);
                 BYTE densByte = (BYTE) densInt;
                 if (densInt < 0) {
                     Logger::getInstance()->debug4("Komorka [%d, %d, %d] mniejsza od 0: %d", i, j, k, densInt);
@@ -58,12 +61,12 @@ BYTE *ExternalRenderer::composeOutArray() {
     return out;
 }
 
-void ExternalRenderer::runBlender(string densityFilePath, int frame) {
+void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefix, int frame, int size) {
     string blenderCmd = Config::getInstance()->blenderExecutablePath +
                         " --background" +
                         " " + Config::getInstance()->blenderScenePath +
                         " --python " + Config::getInstance()->pythonScriptPath +
-                        " --render-output " + dataDirectoryWithPrefix + "_blender_render_###.png" +
+                        " --render-output " + dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_###.png" +
                         " --render-frame " + intToString(frame) +
                         " --" +
                         " " + densityFilePath +
@@ -75,7 +78,7 @@ void ExternalRenderer::runBlender(string densityFilePath, int frame) {
                         " \"verticesActive  = " + intToString(simulation->vertices->getCurrentCount(), 6, '0') + "\"" +
                         " \"verticesTotal   = " + intToString(simulation->vertices->getCreatedCount(), 6, '0') + "\"" +
                         " \"verticesRemoved = " + intToString(simulation->vertices->getDeletedCount(), 6, '0') + "\"" +
-                        " > " + dataDirectoryWithPrefix + "_blender_log.txt 2>&1";
+                        " > " + dataDirectoryWithPrefix + "_blender_" + outputFilePrefix + "_log.txt 2>&1";
 
     int code = system(blenderCmd.c_str());
     if (code != 0) {
@@ -88,11 +91,16 @@ void ExternalRenderer::runBlender(string densityFilePath, int frame) {
 }
 
 void ExternalRenderer::makeVideo(int frames) {
-    string outputVideoFilePath = dataDirectoryWithPrefix + " - " + Config::getInstance()->configDescription + ".mp4";
+    makeVideo(frames, "small");
+    makeVideo(frames, "big");
+}
+
+void ExternalRenderer::makeVideo(int frames, string outputFilePrefix) {
+    string outputVideoFilePath = dataDirectoryWithPrefix + " - " + Config::getInstance()->configDescription + "_" + outputFilePrefix + ".mp4";
     string cmd = Config::getInstance()->ffmpegExecutablePath +
                  " -y" +
                  " -loglevel panic" +
-                 " -i " + dataDirectoryWithPrefix + "_blender_render_%03d.png" +
+                 " -i " + dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_%03d.png" +
                  " \"" + outputVideoFilePath + "\"";
 
     int code = system(cmd.c_str());
@@ -104,16 +112,16 @@ void ExternalRenderer::makeVideo(int frames) {
         Logger::getInstance()->info("Film %s zmontowany", outputVideoFilePath.c_str());
     }
 
-    removeRenderedFrames(frames);
+    removeRenderedFrames(frames, outputFilePrefix);
 }
 
-void ExternalRenderer::removeRenderedFrames(int frames) {
+void ExternalRenderer::removeRenderedFrames(int frames, string outputFilePrefix) {
     for (int frame = 1; frame <= frames; frame++) {
-        string frameFilePath = dataDirectoryWithPrefix + "_blender_render_" + intToString(frame, 3, '0') + ".png";
+        string frameFilePath = dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_" + intToString(frame, 3, '0') + ".png";
         std::remove(frameFilePath.c_str());
     }
 }
 
-int ExternalRenderer::I3D(int i, int j, int k) {
-    return ExplosionSimulation::I3D(i, j, k);
+int ExternalRenderer::I3D(int i, int j, int k, int cubeSize) {
+    return ExplosionSimulation::I3D(i, j, k, cubeSize);
 }

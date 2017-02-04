@@ -15,23 +15,23 @@ public:
 
     void renderFrame(int frame);
 
-    void makeVideo(int i);
+    void makeVideo(int frames);
 
 private:
     string dataDirectoryWithPrefix;
     ExplosionSimulation *simulation;
-    int size;
-    int cellsCount;
 
-    void dumpDensity(string filePath);
+    void dumpDensity(string filePath, float *density, int size);
 
-    BYTE *composeOutArray();
+    BYTE *composeOutArray(float *density, int size);
 
-    void runBlender(string densityFilePath, int i);
+    void runBlender(string densityFilePath, string outputFilePrefix, int frame, int size);
 
-    void removeRenderedFrames(int frames);
+    void makeVideo(int frames, string outputFilePrefix);
 
-    int I3D(int i, int j, int k);
+    void removeRenderedFrames(int frames, string outputFilePrefix);
+
+    int I3D(int i, int j, int k, int cubeSize);
 };
 
 
