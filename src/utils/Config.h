@@ -24,6 +24,7 @@ public:
     int vortexRadiusMin;
     int vortexRadiusMax;
     int waveletTurbulenceAmplify;
+    bool waveletTurbulenceFull;
 
     const int simulationSpaceSize = 100;
     const float dt = 0.25;
@@ -59,7 +60,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 21;
+    const int requiredMainConfigValues = 22;
     const string mainConfigFilePath = "./config.txt";
 
     static Config *instance;

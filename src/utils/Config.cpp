@@ -18,7 +18,7 @@ void Config::readConfig(bool isMain) {
 
     string line;
     int readValues = 0;
-    if(!isMain) {
+    if (!isMain) {
         getline(file, line);
         line[0] = ' '; // pozbycie się #
         line = trim(line); // pozbycie się spacji
@@ -56,6 +56,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "svv") sourceVelocitiesValuesString = value;
         else if (key == "spf") sourcePhaseFramesString = value;
         else if (key == "spvi") sourcePhaseVelocitiesIdxsString = value;
+        else if (key == "waveletTurbulenceFull") waveletTurbulenceFull = "true" == value;
         else {
             Logger::getInstance()->error("Nieznany parametr konfiguracyjny: [%s = %s]", key.c_str(), value.c_str());
             exit(EXIT_FAILURE);

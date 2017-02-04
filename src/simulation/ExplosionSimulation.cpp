@@ -90,9 +90,11 @@ void ExplosionSimulation::proceed() {
     calculateDensities();
 
     float dx = 1.0f / getArraysSize();
-    //_wTurbulence->stepTurbulenceFull(_dt/_dx,
-    //		_xVelocity, _yVelocity, _zVelocity, _obstacles); TODO sprawdzić wyniki tego
-    waveletTurbulence->stepTurbulenceReadable(dt / dx, vx, vy, vz, obstacles);
+    if (Config::getInstance()->waveletTurbulenceFull) {
+        waveletTurbulence->stepTurbulenceFull(dt / dx, vx, vy, vz, obstacles); // TODO sprawdzić wyniki tego
+    } else {
+        waveletTurbulence->stepTurbulenceReadable(dt / dx, vx, vy, vz, obstacles);
+    }
 }
 
 void ExplosionSimulation::addSources() {
