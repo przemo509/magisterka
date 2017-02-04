@@ -26,7 +26,7 @@
 #include "WAVELET_NOISE.h"
 #include "EIGENVALUE_HELPER.h"
 #include "LU_HELPER.h"
-#include "SPHERE.h"
+#include "OBSTACLE.h"
 
 // needed to access static advection functions
 #include "FLUID_3D.h"

@@ -25,46 +25,6 @@
 #include "WTURBULENCE.h"
 #include "INTERPOLATE.h"
 
-//////////////////////////////////////////////////////////////////////
-// add a test cube of density to the center
-//////////////////////////////////////////////////////////////////////
-void FLUID_3D::addSmokeColumn() {
-    addSmokeTestCase(_density, _res);
-    addSmokeTestCase(_heat, _res);
-    if (_wTurbulence) {
-        addSmokeTestCase(_wTurbulence->getDensityBig(), _wTurbulence->getResBig());
-    }
-}
-
-//////////////////////////////////////////////////////////////////////
-// generic static version, so that it can be applied to the
-// WTURBULENCE grid as well
-//////////////////////////////////////////////////////////////////////
-void FLUID_3D::addSmokeTestCase(float *field, Vec3Int res) {
-    const int slabSize = res[0] * res[1];
-    int maxRes = (int) MAX3V(res);
-    float dx = 1.0f / (float) maxRes;
-
-    float xTotal = dx * res[0];
-    float yTotal = dx * res[1];
-    float zTotal = dx * res[2];
-
-    float heighMin = 0.05;
-    float heighMax = 0.10;
-
-    for (int z = 0; z < res[2]; z++)
-        for (int y = (int) (heighMin * res[1]); y <= (int) (heighMax * res[1]); y++)
-            for (int x = 0; x < res[0]; x++) {
-                float xLength = x * dx - xTotal * 0.4f;
-                float zLength = z * dx - zTotal * 0.5f;
-                float radius = sqrtf(xLength * xLength + zLength * zLength);
-
-                if (radius < 0.075f * xTotal) {
-                    int index = x + y * res[0] + z * slabSize;
-                    field[index] = 1.0f;
-                }
-            }
-}
 
 //////////////////////////////////////////////////////////////////////
 // set x direction to Neumann boundary conditions
