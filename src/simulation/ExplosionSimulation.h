@@ -29,6 +29,8 @@ public:
 
     static int I3D(int i, int j, int k);
 
+    static int I3D(int i, int j, int k, int cubeSize);
+
 private:
     static int N;
     float *vxPrev, *vyPrev, *vzPrev, *vx, *vy, *vz;

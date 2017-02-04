@@ -91,8 +91,8 @@ void ExplosionSimulation::proceed() {
 
     float dx = 1.0f / getArraysSize();
     //_wTurbulence->stepTurbulenceFull(_dt/_dx,
-    //		_xVelocity, _yVelocity, _zVelocity, _obstacles);
-    waveletTurbulence->stepTurbulenceReadable(dt / dx, vx, vy, vz, obstacles); // TODO zamienić vy z vz?
+    //		_xVelocity, _yVelocity, _zVelocity, _obstacles); TODO sprawdzić wyniki tego
+    waveletTurbulence->stepTurbulenceReadable(dt / dx, vx, vy, vz, obstacles);
 }
 
 void ExplosionSimulation::addSources() {
@@ -120,12 +120,11 @@ void ExplosionSimulation::addSources() {
                 vy[idx3D] += dvy;
 
                 int amplify = Config::getInstance()->waveletTurbulenceAmplify;
-                int amplifyVolume = amplify * amplify * amplify;
-                double ddPerAmplifyVolume = dd / amplifyVolume;
-                for (int wk = k; wk < k + amplify; wk++) {
-                    for (int wj = j; wj < j + amplify; wj++) {
-                        for (int wi = i; wi < i + amplify; wi++) {
-                            waveletTurbulence->getDensityBig()[I3D(wi, wj, wk)] += ddPerAmplifyVolume; // TODO zamienić Y i Z? TODO += czy =?
+                for (int wk = k * amplify; wk < (k + 1) * amplify; wk++) {
+                    for (int wj = j * amplify; wj < (j + 1) * amplify; wj++) {
+                        for (int wi = i * amplify; wi < (i + 1) * amplify; wi++) {
+                            int wIdx3D = I3D(wi, wj, wk, waveletTurbulence->getResBig().x);
+                            waveletTurbulence->getDensityBig()[wIdx3D] += dd; // TODO += czy =? czy = constant?
                         }
                     }
                 }
@@ -224,8 +223,8 @@ void ExplosionSimulation::diffuse(BoundDirection dir, float factor, float *x, fl
                 for (int i = 1; i <= N; i++) {
                     x[I3D(i, j, k)] =
                             (x0[I3D(i, j, k)] + a * (x[I3D(i - 1, j, k)] + x[I3D(i + 1, j, k)] +
-                                                       x[I3D(i, j - 1, k)] + x[I3D(i, j + 1, k)] +
-                                                       x[I3D(i, j, k - 1)] + x[I3D(i, j, k + 1)])) / precomputedDivider;
+                                                     x[I3D(i, j - 1, k)] + x[I3D(i, j + 1, k)] +
+                                                     x[I3D(i, j, k - 1)] + x[I3D(i, j, k + 1)])) / precomputedDivider;
                 }
             }
         }
@@ -293,7 +292,7 @@ void ExplosionSimulation::project(float *u, float *v, float *w, float *p, float 
         for (int j = 1; j <= N; ++j) {
             for (int i = 1; i <= N; ++i) {
                 div[I3D(i, j, k)] = -(u[I3D(i + 1, j, k)] - u[I3D(i - 1, j, k)] + v[I3D(i, j + 1, k)] - v[I3D(i, j - 1, k)] + w[I3D(i, j, k + 1)] -
-                                        w[I3D(i, j, k - 1)]) / 3.0f / N;
+                                      w[I3D(i, j, k - 1)]) / 3.0f / N;
                 p[I3D(i, j, k)] = 0.0;
             }
         }
@@ -306,7 +305,7 @@ void ExplosionSimulation::project(float *u, float *v, float *w, float *p, float 
             for (int j = 1; j <= N; ++j) {
                 for (int i = 1; i <= N; ++i) {
                     p[I3D(i, j, k)] = (div[I3D(i, j, k)] + p[I3D(i - 1, j, k)] + p[I3D(i + 1, j, k)] + p[I3D(i, j - 1, k)] + p[I3D(i, j + 1, k)] +
-                                         p[I3D(i, j, k - 1)] + p[I3D(i, j, k + 1)]) / 6.0f;
+                                       p[I3D(i, j, k - 1)] + p[I3D(i, j, k + 1)]) / 6.0f;
                 }
             }
         }
@@ -386,6 +385,10 @@ void ExplosionSimulation::advect(BoundDirection dir, float *d, float *d0, float 
     setBoundaries(dir, d);
 }
 
+int ExplosionSimulation::I3D(int i, int j, int k, int cubeSize) {
+    return i * cubeSize * cubeSize + j * cubeSize + k;
+}
+
 int ExplosionSimulation::I3D(int i, int j, int k) {
-    return i * getArraysSize() * getArraysSize() + j * getArraysSize() + k;
+    return I3D(i, j, k, getArraysSize());
 }
