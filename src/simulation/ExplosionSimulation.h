@@ -27,8 +27,6 @@ public:
 
     void setStartingConditions();
 
-    static int I3D(int i, int j, int k);
-
     static int I3D(int i, int j, int k, int cubeSize);
 
 private:
@@ -45,11 +43,11 @@ private:
 
     void calculateDensities();
 
-    void setBoundaries(BoundDirection dir, float *x);
+    static void setBoundaries(BoundDirection dir, float *x, int domainSize);
 
     void project(float *u, float *v, float *w, float *p, float *div);
 
-    void advect(BoundDirection dir, float *d, float *d0, float *u, float *v, float *w);
+    static void advect(BoundDirection dir, float *d, float *d0, float *u, float *v, float *w, int domainSize, float dt);
 
     void diffuse(BoundDirection dir, float factor, float *x, float *x0);
 
@@ -62,6 +60,7 @@ private:
     void clearSpace();
 
     friend class ExternalRenderer;
+    friend class WTURBULENCE;
 
     unsigned char *obstacles;
 

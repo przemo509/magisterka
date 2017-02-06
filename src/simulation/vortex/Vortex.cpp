@@ -44,7 +44,7 @@ void Vortex::apply(float *vx, float *vy, float *vz) {
 }
 
 int Vortex::I3D(int i, int j, int k) const {
-    return ExplosionSimulation::I3D(i, j, k);
+    return ExplosionSimulation::I3D(i, j, k, domainSize);
 }
 
 bool Vortex::shouldBeRemoved() {

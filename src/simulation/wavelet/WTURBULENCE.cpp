@@ -30,6 +30,7 @@
 
 // needed to access static advection functions
 #include "FLUID_3D.h"
+#include "../ExplosionSimulation.h"
 
 #if PARALLEL == 1
 #include <omp.h>
@@ -710,28 +711,13 @@ void WTURBULENCE::stepTurbulenceFull(float dtOrg, float *xvel, float *yvel, floa
     // prepare density for an advection
     SWAP_POINTERS(_densityBig, _densityBigOld);
 
-    // based on the maximum velocity present, see if we need to substep,
-    // but cap the maximum number of substeps to 5
-    const int maxSubSteps = 5;
-    maxVelMag = sqrt(maxVelMag) * dt;
-    int totalSubsteps = (int) (maxVelMag / (float) maxSubSteps);
-    totalSubsteps = (totalSubsteps < 1) ? 1 : totalSubsteps;
-    totalSubsteps = (totalSubsteps > maxSubSteps) ? maxSubSteps : totalSubsteps;
-    const float dtSubdiv = dt / (float) totalSubsteps;
-
     // set boundaries of big velocity grid
     FLUID_3D::setZeroX(_bigUx, _resBig);
     FLUID_3D::setZeroY(_bigUy, _resBig);
     FLUID_3D::setZeroZ(_bigUz, _resBig);
 
-    // do the MacCormack advection, with substepping if necessary
-    for (int substep = 0; substep < totalSubsteps; substep++) {
-        FLUID_3D::advectFieldMacCormack(dtSubdiv, _bigUx, _bigUy, _bigUz,
-                                        _densityBigOld, _densityBig, _tempBig1, _tempBig2, _resBig, NULL);
-
-        if (substep < totalSubsteps - 1)
-            SWAP_POINTERS(_densityBig, _densityBigOld);
-    } // substep
+    // advect
+    ExplosionSimulation::advect(NO_DIR, _densityBig, _densityBigOld, _bigUx, _bigUy, _bigUz, _resBig.x - 2, Config::getInstance()->dt);
 
     // wipe the density borders
     FLUID_3D::setZeroBorder(_densityBig, _resBig);
