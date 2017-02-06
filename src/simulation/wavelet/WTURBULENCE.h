@@ -39,9 +39,6 @@ public:
     /// destructor
     virtual ~WTURBULENCE();
 
-    // step more readable version -- no rotation correction
-    void stepTurbulenceReadable(float dt, float *xvel, float *yvel, float *zvel, unsigned char *obstacles);
-
     // step more complete version -- include rotation correction
     // and use OpenMP if available
     void stepTurbulenceFull(float dt, float *xvel, float *yvel, float *zvel, unsigned char *obstacles);

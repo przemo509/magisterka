@@ -17,7 +17,6 @@ vortexMoving            = 25
 vortexRadiusMin         = 2
 vortexRadiusMax         = 4
 waveletTurbulenceAmplify= 4
-waveletTurbulenceFull   = true
 thermalBuoyancyFactor   = 0.5
 gravityFactor           = 0.0004
 windFactor              = 0.08
