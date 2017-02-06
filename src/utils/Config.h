@@ -20,7 +20,7 @@ public:
     const bool simulateTurbulences = true;
     float verticesCountFactor;
     float vortexStrength;
-    int vortexMoving;
+    float vortexMoving;
     int vortexRadiusMin;
     int vortexRadiusMax;
     int waveletTurbulenceAmplify;

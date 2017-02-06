@@ -43,7 +43,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "maxFrames") maxFrames = atoi(value.c_str());
         else if (key == "verticesCountFactor") verticesCountFactor = atof(value.c_str());
         else if (key == "vortexStrength") vortexStrength = atof(value.c_str());
-        else if (key == "vortexMoving") vortexMoving = atoi(value.c_str());
+        else if (key == "vortexMoving") vortexMoving = atof(value.c_str());
         else if (key == "vortexRadiusMin") vortexRadiusMin = atof(value.c_str());
         else if (key == "vortexRadiusMax") vortexRadiusMax = atof(value.c_str());
         else if (key == "waveletTurbulenceAmplify") waveletTurbulenceAmplify = atoi(value.c_str());
