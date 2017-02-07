@@ -9,7 +9,7 @@ pythonScriptPath          = blender_render_frame.py
 blenderScenePath          = scene.blend
 ffmpegExecutablePath      = ffmpeg
 
-maxFrames                 = 500
+maxFrames                 = 150
 verticesCountFactor       = 40.0
 vortexStrength            = 0.008
 vortexMoving              = 25.0
