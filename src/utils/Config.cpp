@@ -53,9 +53,9 @@ void Config::readConfig(bool isMain) {
         else if (key == "viscosity") viscosity = atof(value.c_str());
         else if (key == "diffusionRate") diffusionRate = atof(value.c_str());
         else if (key == "sourceDensity") sourceDensity = atof(value.c_str());
-        else if (key == "svv") sourceVelocitiesValuesString = value;
-        else if (key == "spf") sourcePhaseFramesString = value;
-        else if (key == "spvi") sourcePhaseVelocitiesIdxsString = value;
+        else if (key == "sourceVelocitiesValues") sourceVelocitiesValuesString = value;
+        else if (key == "sourcePhaseFrames") sourcePhaseFramesString = value;
+        else if (key == "sourcePhaseVelocitiesIdxs") sourcePhaseVelocitiesIdxsString = value;
         else {
             Logger::getInstance()->error("Nieznany parametr konfiguracyjny: [%s = %s]", key.c_str(), value.c_str());
             exit(EXIT_FAILURE);
