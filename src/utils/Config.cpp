@@ -29,8 +29,10 @@ void Config::readConfig(bool isMain) {
             continue;
         }
         vector<string> lineItems = split(line, '=');
-        string key = trim(lineItems[0]);
-        string value = trim(lineItems[1]);
+        string key = lineItems[0];
+        key = trim(key);
+        string value = lineItems.size() > 1 ? lineItems[1] : "";
+        value = trim(value);
 
         if (key == "dataDirectory") {
             dataDirectoryWithPrefix = value + "/" + configName + "/" + configName;
