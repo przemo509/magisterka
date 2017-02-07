@@ -56,6 +56,9 @@ void FluidSource::calculateVelocitiesDistribution(vector<float> velocitiesValues
     }
     maxFrameForVertices = max(Config::getInstance()->maxFrames + 1, phaseFrames.back()); // + 1, bo klatki numerujemy od 1
     velocitiesDistribution = new float[maxFrameForVertices];
+    for (int frame = 0; frame < maxFrameForVertices; ++frame) {
+        velocitiesDistribution[frame] = 0.0;
+    }
 
     for (int phase = 0; phase < phaseFrames.size(); ++phase) {
         int phaseStartFrame = phaseFrames[phase];
