@@ -105,6 +105,8 @@ void ExternalRenderer::makeVideo(int frames, string outputFilePrefix, int saveFr
                  " -y" +
                  " -loglevel panic" +
                  " -i " + dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_%03d.png" +
+                 " -c:v libx264" +
+                 " -pix_fmt yuv420p" +
                  " \"" + outputVideoFilePath + "\"";
 
     int code = system(cmd.c_str());
