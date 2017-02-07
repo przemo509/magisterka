@@ -12,13 +12,17 @@ void ExternalRenderer::renderFrame(int frame) {
     int size = simulation->getArraysSize();
     dumpDensity(densityFilePath, simulation->getDensityArray(), size);
     runBlender(densityFilePath, "small", frame, size);
-    std::remove(densityFilePath.c_str());
+    if (shouldRemove(frame, Config::getInstance()->saveSmallDensity)) {
+        std::remove(densityFilePath.c_str());
+    }
 
     densityFilePath = dataDirectoryWithPrefix + "_density_big_" + intToString(frame, 3, '0') + ".raw";
     size = simulation->waveletTurbulence->getResBig().x; //TODO różne wymiary x, y, z
     dumpDensity(densityFilePath, simulation->waveletTurbulence->getDensityBig(), size);
     runBlender(densityFilePath, "big", frame, size);
-    std::remove(densityFilePath.c_str());
+    if (shouldRemove(frame, Config::getInstance()->saveBigDensity)) {
+        std::remove(densityFilePath.c_str());
+    }
 }
 
 void ExternalRenderer::dumpDensity(string filePath, float *density, int size) {
@@ -91,11 +95,11 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
 }
 
 void ExternalRenderer::makeVideo(int frames) {
-    makeVideo(frames, "small");
-    makeVideo(frames, "big");
+    makeVideo(frames, "small", Config::getInstance()->saveSmallFrames);
+    makeVideo(frames, "big", Config::getInstance()->saveBigFrames);
 }
 
-void ExternalRenderer::makeVideo(int frames, string outputFilePrefix) {
+void ExternalRenderer::makeVideo(int frames, string outputFilePrefix, int saveFrames) {
     string outputVideoFilePath = dataDirectoryWithPrefix + " - " + Config::getInstance()->configDescription + "_" + outputFilePrefix + ".mp4";
     string cmd = Config::getInstance()->ffmpegExecutablePath +
                  " -y" +
@@ -112,16 +116,28 @@ void ExternalRenderer::makeVideo(int frames, string outputFilePrefix) {
         Logger::getInstance()->info("Film %s zmontowany", outputVideoFilePath.c_str());
     }
 
-    removeRenderedFrames(frames, outputFilePrefix);
+    removeRenderedFrames(frames, outputFilePrefix, saveFrames);
 }
 
-void ExternalRenderer::removeRenderedFrames(int frames, string outputFilePrefix) {
+void ExternalRenderer::removeRenderedFrames(int frames, string outputFilePrefix, int saveFrames) {
     for (int frame = 1; frame <= frames; frame++) {
-        string frameFilePath = dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_" + intToString(frame, 3, '0') + ".png";
-        std::remove(frameFilePath.c_str());
+        if (shouldRemove(frame, saveFrames)) {
+            string frameFilePath = dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_" + intToString(frame, 3, '0') + ".png";
+            std::remove(frameFilePath.c_str());
+        }
     }
 }
 
 int ExternalRenderer::I3D(int i, int j, int k, int cubeSize) {
     return ExplosionSimulation::I3D(i, j, k, cubeSize);
+}
+
+bool ExternalRenderer::shouldRemove(int frame, int saveFrames) {
+    if (saveFrames == 0) {
+        return true; // usuwamy wszystko
+    } else if (saveFrames == 1) {
+        return false; // zachowujemy wszystko
+    } else {
+        return frame % saveFrames != 0;
+    }
 }

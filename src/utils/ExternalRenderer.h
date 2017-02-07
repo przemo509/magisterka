@@ -27,11 +27,13 @@ private:
 
     void runBlender(string densityFilePath, string outputFilePrefix, int frame, int size);
 
-    void makeVideo(int frames, string outputFilePrefix);
+    void makeVideo(int frames, string outputFilePrefix, int saveFrames);
 
-    void removeRenderedFrames(int frames, string outputFilePrefix);
+    void removeRenderedFrames(int frames, string outputFilePrefix, int saveFrames);
 
     int I3D(int i, int j, int k, int cubeSize);
+
+    bool shouldRemove(int frame, int saveFrames);
 };
 
 

@@ -25,3 +25,10 @@ sourceDensity             = 0.15
 sourceVelocitiesValues    = 0.0;0.03;0.2;0.7
 sourcePhaseFrames         = 0;12;15;18;80;140;180;220;280;400
 sourcePhaseVelocitiesIdxs = 0;1; 2; 3; 1; 3;  1;  3;  1;  0
+
+# Zapisywanie (nie usuwanie) wyników pośrednich.
+# 0 - nie, 1 - z każdej klatki, 2 - z co drugiej, 3 - z co trzeciej itp.
+saveSmallDensity          = 0
+saveBigDensity            = 0
+saveSmallFrames           = 0
+saveBigFrames             = 0

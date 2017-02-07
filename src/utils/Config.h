@@ -50,6 +50,11 @@ public:
     string blenderScenePath;
     string ffmpegExecutablePath;
 
+    int saveSmallDensity;
+    int saveBigDensity;
+    int saveSmallFrames;
+    int saveBigFrames;
+
     static Config *getInstance() {
         return instance;
     }
@@ -59,7 +64,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 21;
+    const int requiredMainConfigValues = 25;
     const string mainConfigFilePath = "./config.txt";
 
     static Config *instance;

@@ -56,6 +56,10 @@ void Config::readConfig(bool isMain) {
         else if (key == "sourceVelocitiesValues") sourceVelocitiesValuesString = value;
         else if (key == "sourcePhaseFrames") sourcePhaseFramesString = value;
         else if (key == "sourcePhaseVelocitiesIdxs") sourcePhaseVelocitiesIdxsString = value;
+        else if (key == "saveSmallDensity") saveSmallDensity = atoi(value.c_str());
+        else if (key == "saveBigDensity") saveBigDensity = atoi(value.c_str());
+        else if (key == "saveSmallFrames") saveSmallFrames = atoi(value.c_str());
+        else if (key == "saveBigFrames") saveBigFrames = atoi(value.c_str());
         else {
             Logger::getInstance()->error("Nieznany parametr konfiguracyjny: [%s = %s]", key.c_str(), value.c_str());
             exit(EXIT_FAILURE);
