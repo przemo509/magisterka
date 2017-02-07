@@ -32,3 +32,6 @@ saveSmallDensity          = 0
 saveBigDensity            = 0
 saveSmallFrames           = 0
 saveBigFrames             = 0
+
+# Komenda wykonywana na koniec przetwarzania, może posłużyć do powiadomienia np. mailem. Obsługuje zmienną $configName.
+commandOnFinish           = msg "%username%" /TIME:75600 "Koniec przetwarzania $configName"

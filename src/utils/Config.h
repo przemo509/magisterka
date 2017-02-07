@@ -49,6 +49,7 @@ public:
     string pythonScriptPath;
     string blenderScenePath;
     string ffmpegExecutablePath;
+    string commandOnFinish;
 
     int saveSmallDensity;
     int saveBigDensity;
@@ -64,7 +65,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 25;
+    const int requiredMainConfigValues = 26;
     const string mainConfigFilePath = "./config.txt";
 
     static Config *instance;

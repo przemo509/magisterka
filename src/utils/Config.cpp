@@ -40,6 +40,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "pythonScriptPath") pythonScriptPath = value;
         else if (key == "blenderScenePath") blenderScenePath = value;
         else if (key == "ffmpegExecutablePath") ffmpegExecutablePath = value;
+        else if (key == "commandOnFinish") commandOnFinish = value;
         else if (key == "maxFrames") maxFrames = atoi(value.c_str());
         else if (key == "verticesCountFactor") verticesCountFactor = atof(value.c_str());
         else if (key == "vortexStrength") vortexStrength = atof(value.c_str());
