@@ -4,7 +4,7 @@
 FluidSource::FluidSource(Config *config) {
     radius = 6;
     height = 3;
-    positionX = 0 + radius + 5; // po lewej stronie, trochę dalej od krawędzi
+    positionX = 0 + radius + 20; // po lewej stronie, trochę dalej od krawędzi
     positionY = 2; // tuż nad brzegiem
     positionZ = Config::getInstance()->simulationSpaceSize / 2; // po środku
     density = config->sourceDensity;
