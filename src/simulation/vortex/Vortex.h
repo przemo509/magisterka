@@ -10,7 +10,7 @@ public:
 
     virtual ~Vortex();
 
-    void apply(float *vx, float *vy, float *vz);
+    void apply(float *vx, float *vy, float *vz, float *dens);
 
 private:
     static const int vortexRemovalBorder = 5; // TODO zbadać rózne ustawienia

@@ -13,7 +13,7 @@ Vortex::Vortex(int id, int x, int y, int z, int domainSize) : id(id), domainSize
 Vortex::~Vortex() {
 }
 
-void Vortex::apply(float *vx, float *vy, float *vz) {
+void Vortex::apply(float *vx, float *vy, float *vz, float *dens) {
     for (int k = (int) (position.z - radius); k <= position.z + radius; ++k) {
         if (k < 0) continue;
         if (k >= domainSize) break;
@@ -37,9 +37,9 @@ void Vortex::apply(float *vx, float *vy, float *vz) {
     int oldY = (int) position.y;
     int oldZ = (int) position.z;
     int oldIdx3D = I3D(oldX, oldY, oldZ);
-    position.x += Config::getInstance()->vortexMoving * vx[oldIdx3D];
-    position.y += Config::getInstance()->vortexMoving * vy[oldIdx3D];
-    position.z += Config::getInstance()->vortexMoving * vz[oldIdx3D];
+    position.x += Config::getInstance()->vortexMoving * vx[oldIdx3D] * dens[oldIdx3D];
+    position.y += Config::getInstance()->vortexMoving * vy[oldIdx3D] * dens[oldIdx3D];
+    position.z += Config::getInstance()->vortexMoving * vz[oldIdx3D] * dens[oldIdx3D];
     framesLived++;
 }
 

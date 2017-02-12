@@ -25,10 +25,10 @@ VerticesList::~VerticesList() {
     delete[] verticesDistribution;
 }
 
-void VerticesList::applyAll(float *vx, float *vy, float *vz) {
+void VerticesList::applyAll(float *vx, float *vy, float *vz, float *dens) {
     Vortex *tmp = (Vortex *) getFirst();
     while (tmp != NULL) {
-        tmp->apply(vx, vy, vz);
+        tmp->apply(vx, vy, vz, dens);
         Vortex *next = (Vortex *) tmp->next;
         if (tmp->shouldBeRemoved()) {
             remove(tmp);
