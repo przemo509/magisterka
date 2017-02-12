@@ -58,11 +58,16 @@ int main(int argc, char **argv) {
 
     renderer->makeVideo(currentFrame);
 
-    string commandOnFinish = regex_replace(Config::getInstance()->commandOnFinish, regex("\\$configName"), configName);
+    long totalElapsedTime = Timer::getInstance().getCurrentTime() - programStartTime;
+    
+    string commandOnFinish = Config::getInstance()->commandOnFinish;
+    string shortMsg = "Przetwarzanie " + configName + " zakończyło się po czasie " + formatTime(totalElapsedTime);
+    string fullMsg = "Przetwarzanie " + configName + " zakończyło się po czasie " + formatTime(totalElapsedTime);
+    commandOnFinish = regex_replace(commandOnFinish, regex("\\$shortMsg"), shortMsg);
+    commandOnFinish = regex_replace(commandOnFinish, regex("\\$fullMsg"), fullMsg);
     system(commandOnFinish.c_str());
     
     Logger::getInstance()->info("Koniec przetwarzania %s", configName.c_str());
-    long totalElapsedTime = Timer::getInstance().getCurrentTime() - programStartTime;
     Logger::getInstance()->info("Całkowity czas trwania: %s", formatTime(totalElapsedTime).c_str());
     Logger::getInstance()->info("Czas trwania na klatkę (średnio): %s", formatTime(totalElapsedTime / currentFrame).c_str());
 
