@@ -16,12 +16,14 @@ void ExternalRenderer::renderFrame(int frame) {
         std::remove(densityFilePath.c_str());
     }
 
-    densityFilePath = dataDirectoryWithPrefix + "_density_big_" + intToString(frame, 3, '0') + ".raw";
-    size = simulation->waveletTurbulence->getResBig().x; //TODO różne wymiary x, y, z
-    dumpDensity(densityFilePath, simulation->waveletTurbulence->getDensityBig(), size);
-    runBlender(densityFilePath, "big", frame, size);
-    if (shouldRemove(frame, Config::getInstance()->saveBigDensity)) {
-        std::remove(densityFilePath.c_str());
+    if(Config::getInstance()->useWaveletTurbulence) {
+        densityFilePath = dataDirectoryWithPrefix + "_density_big_" + intToString(frame, 3, '0') + ".raw";
+        size = simulation->waveletTurbulence->getResBig().x; //TODO różne wymiary x, y, z
+        dumpDensity(densityFilePath, simulation->waveletTurbulence->getDensityBig(), size);
+        runBlender(densityFilePath, "big", frame, size);
+        if (shouldRemove(frame, Config::getInstance()->saveBigDensity)) {
+            std::remove(densityFilePath.c_str());
+        }
     }
 }
 
@@ -96,7 +98,9 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
 
 void ExternalRenderer::makeVideo(int frames) {
     makeVideo(frames, "small", Config::getInstance()->saveSmallFrames);
-    makeVideo(frames, "big", Config::getInstance()->saveBigFrames);
+    if(Config::getInstance()->useWaveletTurbulence) {
+        makeVideo(frames, "big", Config::getInstance()->saveBigFrames);
+    }
 }
 
 void ExternalRenderer::makeVideo(int frames, string outputFilePrefix, int saveFrames) {

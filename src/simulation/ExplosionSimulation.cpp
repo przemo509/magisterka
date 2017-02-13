@@ -43,7 +43,11 @@ ExplosionSimulation::ExplosionSimulation() {
     source = new FluidSource(Config::getInstance());
     vertices = new VerticesList(getArraysSize(), source);
 
-    waveletTurbulence = new WTURBULENCE(getArraysSize(), getArraysSize(), getArraysSize(), Config::getInstance()->waveletTurbulenceAmplify);
+    if (Config::getInstance()->useWaveletTurbulence) {
+        waveletTurbulence = new WTURBULENCE(getArraysSize(), getArraysSize(), getArraysSize(), Config::getInstance()->waveletTurbulenceAmplify);
+    } else {
+        waveletTurbulence = NULL;
+    }
 
     setStartingConditions();
 }
@@ -60,7 +64,9 @@ ExplosionSimulation::~ExplosionSimulation() {
     delete[] obstacles;
     delete source;
     delete vertices;
-    delete waveletTurbulence;
+    if (waveletTurbulence) {
+        delete waveletTurbulence;
+    }
 }
 
 void ExplosionSimulation::setStartingConditions() {
@@ -89,13 +95,15 @@ void ExplosionSimulation::proceed() {
     calculateVelocities();
     calculateDensities();
 
-    float dx = 1.0f / getArraysSize();
-    waveletTurbulence->stepTurbulenceFull(dt / dx, vx, vy, vz, obstacles);
+    if (waveletTurbulence) {
+        float dx = 1.0f / getArraysSize();
+        waveletTurbulence->stepTurbulenceFull(dt / dx, vx, vy, vz, obstacles);
+    }
 }
 
 void ExplosionSimulation::addSources() {
     int cubeSize = getArraysSize();
-    int wCubeSize = waveletTurbulence->getResBig().x;
+    int wCubeSize = waveletTurbulence ? waveletTurbulence->getResBig().x : -1;
     int startX = source->getStartX();
     int endX = source->getEndX();
     int startY = source->getStartY();
@@ -119,12 +127,14 @@ void ExplosionSimulation::addSources() {
                 vz[idx3D] += dvz;
                 vy[idx3D] += dvy;
 
-                int amplify = Config::getInstance()->waveletTurbulenceAmplify;
-                for (int wk = k * amplify; wk < (k + 1) * amplify; wk++) {
-                    for (int wj = j * amplify; wj < (j + 1) * amplify; wj++) {
-                        for (int wi = i * amplify; wi < (i + 1) * amplify; wi++) {
-                            int wIdx3D = I3D(wi, wj, wk, wCubeSize);
-                            waveletTurbulence->getDensityBig()[wIdx3D] += dd;
+                if(waveletTurbulence) {
+                    int amplify = Config::getInstance()->waveletTurbulenceAmplify;
+                    for (int wk = k * amplify; wk < (k + 1) * amplify; wk++) {
+                        for (int wj = j * amplify; wj < (j + 1) * amplify; wj++) {
+                            for (int wi = i * amplify; wi < (i + 1) * amplify; wi++) {
+                                int wIdx3D = I3D(wi, wj, wk, wCubeSize);
+                                waveletTurbulence->getDensityBig()[wIdx3D] += dd;
+                            }
                         }
                     }
                 }
