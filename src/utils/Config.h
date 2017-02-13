@@ -44,6 +44,7 @@ public:
 
     float rayTracingStepSize;
 
+    const string mainConfigFilePath = "./config.txt";
     string configName;
     string dataDirectoryWithPrefix;
     string configFilePath;
@@ -69,7 +70,6 @@ public:
 
 private:
     const int requiredMainConfigValues = 28;
-    const string mainConfigFilePath = "./config.txt";
 
     static Config *instance;
 
