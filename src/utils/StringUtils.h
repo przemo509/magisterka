@@ -46,6 +46,12 @@ static inline string intToString(int i) {
     return ss.str();
 }
 
+static inline string floatToString(float f) {
+    stringstream ss;
+    ss << f;
+    return ss.str();
+}
+
 static inline string intToString(int i, int width, char padding) {
     stringstream ss;
     ss << setfill(padding) << setw(width) << i << setfill(' ');

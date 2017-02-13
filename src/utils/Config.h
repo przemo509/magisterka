@@ -42,6 +42,8 @@ public:
 
     const int relaxationSteps = 12; // liczba iteracji relaksacji Gaussa-Seidela
 
+    float rayTracingStepSize;
+
     string configName;
     string dataDirectoryWithPrefix;
     string configFilePath;
@@ -66,7 +68,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 27;
+    const int requiredMainConfigValues = 28;
     const string mainConfigFilePath = "./config.txt";
 
     static Config *instance;

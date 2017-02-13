@@ -79,6 +79,7 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
                         " " + intToString(size) +
                         " " + intToString(size) +
                         " " + intToString(size) +
+                        " " + floatToString(Config::getInstance()->rayTracingStepSize) +
                         " " + Config::getInstance()->configFilePath +
                         " \"frame           = " + intToString(frame, 6, '0') + "\"" +
                         " \"verticesActive  = " + intToString(simulation->vertices->getCurrentCount(), 6, '0') + "\"" +
