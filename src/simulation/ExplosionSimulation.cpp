@@ -165,7 +165,7 @@ void ExplosionSimulation::addTurbulences() {
     }
 
     vertices->addNewVertices();
-    vertices->applyAll(vx, vy, vz);
+    vertices->applyAll(vx, vy, vz, dens);
 }
 
 void ExplosionSimulation::calculateVelocities() {
