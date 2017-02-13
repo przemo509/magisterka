@@ -35,6 +35,10 @@ public:
     float gravityFactor;
     float windFactor;
 
+    string sourcePositionString;
+    int sourceRadius;
+    int sourceHeight;
+    float sourceSpreadFactor;
     float sourceDensity;
     string sourceVelocitiesValuesString;
     string sourcePhaseFramesString;
@@ -69,7 +73,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 28;
+    const int requiredMainConfigValues = 32;
 
     static Config *instance;
 

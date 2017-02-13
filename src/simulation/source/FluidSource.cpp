@@ -2,13 +2,14 @@
 #include "../../utils/Timer.h"
 
 FluidSource::FluidSource(Config *config) {
-    radius = 6;
-    height = 3;
-    positionX = 0 + radius + 20; // po lewej stronie, trochę dalej od krawędzi
-    positionY = 2; // tuż nad brzegiem
-    positionZ = Config::getInstance()->simulationSpaceSize / 2; // po środku
+    vector<string> sourcePositionStrings = split(config->sourcePositionString, Config::numbersDelimiter);
+    positionX = atoi(sourcePositionStrings[0].c_str());
+    positionY = atoi(sourcePositionStrings[1].c_str());
+    positionZ = atoi(sourcePositionStrings[2].c_str());
+    radius = config->sourceRadius;
+    height = config->sourceHeight;
     density = config->sourceDensity;
-    spreadFactor = 0.35;
+    spreadFactor = config->sourceSpreadFactor;
 
     vector<float> velocitiesValues = parseVelocities(config->sourceVelocitiesValuesString);
     vector<int> phaseFrames = parsePhaseFrames(config->sourcePhaseFramesString);
