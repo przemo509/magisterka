@@ -14,8 +14,9 @@ xRes = int(argv[1])
 yRes = int(argv[2])
 zRes = int(argv[3])
 rayTracingStepSize = float(argv[4])
-configFilePath = argv[5]
-additionalTextsToDisplay = argv[6:]
+threads = int(argv[5])
+configFilePath = argv[6]
+additionalTextsToDisplay = argv[7:]
 
 bpy.context.scene.objects.active = bpy.data.objects['domain']
 bpy.data.textures["Tex"].voxel_data.filepath = densityFilePath
@@ -23,6 +24,8 @@ bpy.data.textures["Tex"].voxel_data.resolution[0] = xRes
 bpy.data.textures["Tex"].voxel_data.resolution[1] = yRes
 bpy.data.textures["Tex"].voxel_data.resolution[2] = zRes
 bpy.context.scene.objects.active.active_material.volume.step_size = rayTracingStepSize
+
+bpy.context.scene.render.threads = threads
 
 bpy.context.scene.objects.active = bpy.data.objects['Text']
 bpy.ops.object.editmode_toggle()

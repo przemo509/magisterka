@@ -69,6 +69,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "saveBigDensity") saveBigDensity = atoi(value.c_str());
         else if (key == "saveSmallFrames") saveSmallFrames = atoi(value.c_str());
         else if (key == "saveBigFrames") saveBigFrames = atoi(value.c_str());
+        else if (key == "threads") threads = atoi(value.c_str());
         else {
             Logger::getInstance()->error("Nieznany parametr konfiguracyjny: [%s = %s]", key.c_str(), value.c_str());
             exit(EXIT_FAILURE);

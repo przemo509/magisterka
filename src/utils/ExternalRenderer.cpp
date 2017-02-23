@@ -68,10 +68,11 @@ BYTE *ExternalRenderer::composeOutArray(float *density, int size) {
 }
 
 void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefix, int frame, int size) {
-    string blenderCmd = Config::getInstance()->blenderExecutablePath +
+    Config *config = Config::getInstance();
+    string blenderCmd = config->blenderExecutablePath +
                         " --background" +
-                        " " + Config::getInstance()->blenderScenePath +
-                        " --python " + Config::getInstance()->pythonScriptPath +
+                        " " + config->blenderScenePath +
+                        " --python " + config->pythonScriptPath +
                         " --render-output " + dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_###.png" +
                         " --render-frame " + intToString(frame) +
                         " --" +
@@ -79,8 +80,9 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
                         " " + intToString(size) +
                         " " + intToString(size) +
                         " " + intToString(size) +
-                        " " + floatToString(Config::getInstance()->rayTracingStepSize) +
-                        " " + (frame == 1 ? Config::getInstance()->mainConfigFilePath : Config::getInstance()->configFilePath) +
+                        " " + floatToString(config->rayTracingStepSize) +
+                        " " + intToString(config->threads) +
+                        " " + (frame == 1 ? config->mainConfigFilePath : config->configFilePath) +
                         " \"frame           = " + intToString(frame, 6, '0') + "\"" +
                         " \"verticesActive  = " + intToString(simulation->vertices->getCurrentCount(), 6, '0') + "\"" +
                         " \"verticesTotal   = " + intToString(simulation->vertices->getCreatedCount(), 6, '0') + "\"" +

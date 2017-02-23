@@ -64,6 +64,8 @@ public:
     int saveSmallFrames;
     int saveBigFrames;
 
+    int threads;
+
     static Config *getInstance() {
         return instance;
     }
@@ -73,7 +75,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 32;
+    const int requiredMainConfigValues = 33;
 
     static Config *instance;
 

@@ -1,4 +1,5 @@
 #include <regex>
+#include <omp.h>
 #include "simulation/ExplosionSimulation.h"
 #include "utils/Timer.h"
 #include "utils/ExternalRenderer.h"
@@ -32,6 +33,7 @@ int main(int argc, char **argv) {
 
     string configName = string(argv[1]);
     Config::init(configName);
+    omp_set_num_threads(Config::getInstance()->threads);
 
     Logger::getInstance()->info("Początek przetwarzania %s", configName.c_str());
 
