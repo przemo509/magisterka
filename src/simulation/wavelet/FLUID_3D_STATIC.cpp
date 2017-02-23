@@ -208,10 +208,8 @@ void FLUID_3D::advectFieldSemiLagrange(const float dt, const float *velx, const 
     const int slabSize = res[0] * res[1];
 
     // scale dt up to grid resolution
-#if PARALLEL == 1 && !_WIN32
 #pragma omp parallel
 #pragma omp for  schedule(static)
-#endif
     for (int z = 0; z < zres; z++)
         for (int y = 0; y < yres; y++)
             for (int x = 0; x < xres; x++) {

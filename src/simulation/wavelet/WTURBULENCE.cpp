@@ -32,9 +32,7 @@
 #include "FLUID_3D.h"
 #include "../ExplosionSimulation.h"
 
-#if PARALLEL == 1
 #include <omp.h>
-#endif // PARALLEL
 
 // 2^ {-5/6}
 static const float persistence = 0.56123f;
@@ -551,22 +549,10 @@ void WTURBULENCE::stepTurbulenceFull(float dtOrg, float *xvel, float *yvel, floa
         if (obstacles[x]) _energy[x] = 0.f;
 
     // parallel region setup
-    float maxVelMagThreads[8] = {-1., -1., -1., -1., -1., -1., -1., -1.};
-#if PARALLEL == 1 && !_WIN32
 #pragma omp parallel
-#endif
     {
-        float maxVelMag1 = 0.;
-#if PARALLEL == 1 && !_WIN32
-        const int id  = omp_get_thread_num(), num = omp_get_num_threads();
-#else
-        const int id = 0;
-#endif
-
         // vector noise main loop
-#if PARALLEL == 1 && !_WIN32
 #pragma omp for  schedule(static)
-#endif
         for (int zSmall = 0; zSmall < _zResSm; zSmall++)
             for (int ySmall = 0; ySmall < _yResSm; ySmall++)
                 for (int xSmall = 0; xSmall < _xResSm; xSmall++) {
@@ -679,12 +665,6 @@ void WTURBULENCE::stepTurbulenceFull(float dtOrg, float *xvel, float *yvel, floa
                                 _bigUy[index] = vel[1];
                                 _bigUz[index] = vel[2];
 
-                                // compute the velocity magnitude for substepping later
-                                const float velMag = _bigUx[index] * _bigUx[index] +
-                                                     _bigUy[index] * _bigUy[index] +
-                                                     _bigUz[index] * _bigUz[index];
-                                if (velMag > maxVelMag1) maxVelMag1 = velMag;
-
                                 // zero out velocity inside obstacles
                                 float obsCheck = INTERPOLATE::lerp3dToFloat(
                                         obstacles, posSm[0], posSm[1], posSm[2], _xResSm, _yResSm, _zResSm);
@@ -692,21 +672,8 @@ void WTURBULENCE::stepTurbulenceFull(float dtOrg, float *xvel, float *yvel, floa
                                     _bigUx[index] = _bigUy[index] = _bigUz[index] = 0.;
                             } // xyz
 
-#if PARALLEL == 1 && !_WIN32
-                    maxVelMagThreads[id] = maxVelMag1;
-#else
-                    maxVelMagThreads[0] = maxVelMag1;
-#endif
                 }
     } // omp
-
-    // compute maximum over threads
-    float maxVelMag = maxVelMagThreads[0];
-#if PARALLEL == 1 && !_WIN32
-    for (int i = 1; i < 8; i++)
-    if (maxVelMag < maxVelMagThreads[i])
-      maxVelMag = maxVelMagThreads[i];
-#endif
 
     // prepare density for an advection
     SWAP_POINTERS(_densityBig, _densityBigOld);
