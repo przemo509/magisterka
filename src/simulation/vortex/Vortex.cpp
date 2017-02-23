@@ -37,9 +37,9 @@ void Vortex::apply(float *vx, float *vy, float *vz, float *dens) {
     int oldY = (int) position.y;
     int oldZ = (int) position.z;
     int oldIdx3D = I3D(oldX, oldY, oldZ);
-    position.x += Config::getInstance()->vortexMoving * vx[oldIdx3D] * dens[oldIdx3D];
-    position.y += Config::getInstance()->vortexMoving * vy[oldIdx3D] * dens[oldIdx3D];
-    position.z += Config::getInstance()->vortexMoving * vz[oldIdx3D] * dens[oldIdx3D];
+    position.x += Config::getInstance()->vortexMoving * vx[oldIdx3D];
+    position.y += Config::getInstance()->vortexMoving * vy[oldIdx3D];
+    position.z += Config::getInstance()->vortexMoving * vz[oldIdx3D];
     framesLived++;
 }
 
