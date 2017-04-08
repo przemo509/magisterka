@@ -91,7 +91,7 @@ void ExplosionSimulation::clearSpace() {
 void ExplosionSimulation::proceed() {
     addSources();
     addForces();
-    addTurbulences();
+    addVertices();
     calculateVelocities();
     calculateDensities();
 
@@ -159,8 +159,8 @@ void ExplosionSimulation::addForces() {
     }
 }
 
-void ExplosionSimulation::addTurbulences() {
-    if (!Config::getInstance()->simulateTurbulences) {
+void ExplosionSimulation::addVertices() {
+    if (!Config::getInstance()->simulateVertices) {
         return;
     }
 
