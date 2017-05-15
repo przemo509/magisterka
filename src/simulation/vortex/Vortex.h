@@ -13,7 +13,7 @@ public:
     void apply(float *vx, float *vy, float *vz, float *dens);
 
 private:
-    static const int vortexRemovalBorder = 5; // TODO zbadać rózne ustawienia
+    static const int vortexRemovalBorder = 5;
     const int domainSize;
     const int id;
 

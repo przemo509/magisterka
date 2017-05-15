@@ -12,7 +12,7 @@ float *ExplosionSimulation::getDensityArray() {
 int ExplosionSimulation::N = 0;
 
 int ExplosionSimulation::getArraysSize() {
-    return N + 2;
+    return N + 2; // jednokomórkowa granica bezpieczeństwa na każdej z krawędzi wolumenu
 }
 
 int ExplosionSimulation::getArraysSize3D() {
@@ -88,6 +88,9 @@ void ExplosionSimulation::clearSpace() {
     }
 }
 
+/**
+ * Główna funkcja symulatora, przeprowadza kolejne kroki algorytmu dla bieżącej klatki animacji.
+ */
 void ExplosionSimulation::proceed() {
     addSources();
     addForces();
@@ -101,6 +104,9 @@ void ExplosionSimulation::proceed() {
     }
 }
 
+/**
+ * Uwzględnienie prędkości i gęstości wprowadzanej przez źródło gazu.
+ */
 void ExplosionSimulation::addSources() {
     int cubeSize = getArraysSize();
     int wCubeSize = waveletTurbulence ? waveletTurbulence->getResBig().x : -1;
@@ -112,7 +118,7 @@ void ExplosionSimulation::addSources() {
     int startZ = source->getStartZ();
     float dvy = dt * source->getCurrentVelocity(); // bieżąca prędkość źródła w górę
 
-    // pętla po wszystkich komórkach źródła (które nie jest punktowe, tylko ma swoją objetość)
+    // pętla po wszystkich komórkach źródła (które nie jest punktowe, tylko ma swoją objętość)
     for (int k = startZ; k < endZ; ++k) {
         int dk = k - source->positionZ;
         double dvz = dt * sin(dk) * source->spreadFactor; // na zewnątrz
@@ -143,6 +149,12 @@ void ExplosionSimulation::addSources() {
     }
 }
 
+/**
+ * Uwzględnienie dodatkowych sił występujących w scenie:
+ *  - grawitacja,
+ *  - termiczne unoszenie,
+ *  - wiatr.
+ */
 void ExplosionSimulation::addForces() {
     int size = getArraysSize();
     for (int k = 0; k < size; ++k) {
@@ -159,6 +171,9 @@ void ExplosionSimulation::addForces() {
     }
 }
 
+/**
+ * Uwzględnienie wpływu modelu wirów.
+ */
 void ExplosionSimulation::addVertices() {
     if (!Config::getInstance()->simulateVertices) {
         return;
@@ -168,6 +183,13 @@ void ExplosionSimulation::addVertices() {
     vertices->applyAll(vx, vy, vz, dens);
 }
 
+/**
+ * Bazowa symulacja w zakresie pola prędkości:
+ *  - dyfuzja,
+ *  - projekcja,
+ *  - (samo)unoszenie,
+ *  - ponowna projekcja.
+ */
 void ExplosionSimulation::calculateVelocities() {
     SWAP_POINTERS(vxPrev, vx);
     SWAP_POINTERS(vyPrev, vy);
@@ -189,6 +211,11 @@ void ExplosionSimulation::calculateVelocities() {
     project(vx, vy, vz, vxPrev, vyPrev);
 }
 
+/**
+ * Bazowa symulacja w zakresie pola gęstości:
+ *  - dyfuzja,
+ *  - unoszenie.
+ */
 void ExplosionSimulation::calculateDensities() {
     SWAP_POINTERS(densPrev, dens);
     diffuse(NO_DIR, diffusionRate, dens, densPrev);
@@ -197,32 +224,7 @@ void ExplosionSimulation::calculateDensities() {
 }
 
 /**
- * Niestabilna dyfuzja.
- */
-//void ExplosionSimulation::diffuse(BoundDirection dir, float factor, vect3f x, vect3f x0) {
-//	float a = dt * factor * N * N;
-//	for(int k = 1; k <= N; ++k) {
-//		for(int j = 1; j <= N; ++j) {
-//			for(int i = 1; i <= N; ++i) {
-//				x[I3D(i, j, k, cubeSize)] =
-//						x0[I3D(i, j, k, cubeSize)] +
-//						a*(
-//						x0[I3D(i-1, j, k, cubeSize)] +
-//						x0[I3D(i+1, j, k, cubeSize)] +
-//						x0[I3D(i, j-1, k, cubeSize)] +
-//						x0[I3D(i, j+1, k, cubeSize)] +
-//						x0[I3D(i, j, k-1, cubeSize)] +
-//						x0[I3D(i, j, k+1, cubeSize)] -
-//						6 * x0[I3D(i, j, k, cubeSize)]
-//						);
-//			}
-//		}
-//	}
-//	setBoundaries(dir, x);
-//}
-
-/**
- * stabilna dyfuzja.
+ * Stabilny algorytm dyfuzji Josa Stama, wykorzystujący relaksację Gaussa-Seidela do rozwiązania liniowego układu równań.
  */
 void ExplosionSimulation::diffuse(BoundDirection dir, float factor, float *x, float *x0) {
     int cubeSize = getArraysSize();
@@ -243,6 +245,9 @@ void ExplosionSimulation::diffuse(BoundDirection dir, float factor, float *x, fl
     }
 }
 
+/**
+ * Wymuszenie warunków brzegowych, czyli ustawienie na brzegu domeny takich samych wartości pól jak w warstwie o jedną komórkę głębiej.
+ */
 void ExplosionSimulation::setBoundaries(BoundDirection dir, float *x, int N) {
     int cubeSize = N + 2;
     int xSign = dir == X_DIR ? -1 : 1;
@@ -299,6 +304,9 @@ void ExplosionSimulation::setBoundaries(BoundDirection dir, float *x, int N) {
     x[I3D(N + 1, N + 1, N + 1, cubeSize)] = (x[I3D(N, N + 1, N + 1, cubeSize)] + x[I3D(N + 1, N, N + 1, cubeSize)] + x[I3D(N + 1, N + 1, N, cubeSize)]) / 3;
 }
 
+/**
+ * Algorytm projekcji pola prędkości do układu współrzędnych pozwalającego spełnić zasadę zachowania masy gazu (wymuszenie bezźródłowości pola prędkości).
+ */
 void ExplosionSimulation::project(float *u, float *v, float *w, float *p, float *div) {
     int cubeSize = getArraysSize();
 
@@ -345,6 +353,9 @@ void ExplosionSimulation::project(float *u, float *v, float *w, float *p, float 
     setBoundaries(Z_DIR, w, N);
 }
 
+/**
+ * Algorytm unoszenia zadanego pola w polu prędkości (wersja stabilna).
+ */
 void ExplosionSimulation::advect(BoundDirection dir, float *d, float *d0, float *u, float *v, float *w, int N, float dt) {
     int cubeSize = N + 2;
 
@@ -405,6 +416,9 @@ void ExplosionSimulation::advect(BoundDirection dir, float *d, float *d0, float 
     setBoundaries(dir, d, N);
 }
 
+/**
+ * Funkcja pomocnicza służąca do mapowania indeksu w trójwymiarowej tablicy o rozmiarze cubeSize^3 na indeks w tablicy jednowymiarowej.
+ */
 int ExplosionSimulation::I3D(int i, int j, int k, int cubeSize) {
     return i * cubeSize * cubeSize + j * cubeSize + k;
 }

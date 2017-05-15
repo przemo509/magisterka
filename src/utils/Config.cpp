@@ -8,6 +8,9 @@ Config::Config(string configName) {
     readConfig(false);
 }
 
+/**
+ * Odczytanie zawartości głównego lub pomocniczego pliku konfiguracyjnego.
+ */
 void Config::readConfig(bool isMain) {
     string filePath = isMain ? mainConfigFilePath : configFilePath;
     ifstream file(filePath.c_str(), ios::in);

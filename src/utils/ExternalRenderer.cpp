@@ -1,7 +1,9 @@
 #include <cstring>
 #include "ExternalRenderer.h"
 #include "Config.h"
-
+/**
+ * Obsługa wizualizacji w programie Blender.
+ */
 ExternalRenderer::ExternalRenderer(ExplosionSimulation *simulation) {
     dataDirectoryWithPrefix = Config::getInstance()->dataDirectoryWithPrefix;
     this->simulation = simulation;
@@ -18,7 +20,7 @@ void ExternalRenderer::renderFrame(int frame) {
 
     if(Config::getInstance()->useWaveletTurbulence) {
         densityFilePath = dataDirectoryWithPrefix + "_density_big_" + intToString(frame, 3, '0') + ".raw";
-        size = simulation->waveletTurbulence->getResBig().x; //TODO różne wymiary x, y, z
+        size = simulation->waveletTurbulence->getResBig().x;
         dumpDensity(densityFilePath, simulation->waveletTurbulence->getDensityBig(), size);
         runBlender(densityFilePath, "big", frame, size);
         if (shouldRemove(frame, Config::getInstance()->saveBigDensity)) {

@@ -15,7 +15,7 @@ public:
     static const char numbersDelimiter = ';';
 
     int maxFrames;
-    const int framesToSkipRender = 1; // 1 żeby renderować wszystkie klatki
+    const int framesToSkipRender = 1; // ustawić na 1, żeby renderować wszystkie klatki
 
     const bool simulateVertices = true;
     float verticesCountFactor;

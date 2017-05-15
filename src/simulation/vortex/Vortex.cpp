@@ -48,7 +48,7 @@ int Vortex::I3D(int i, int j, int k) const {
 }
 
 bool Vortex::shouldBeRemoved() {
-    return isBehindBorder(0) || (framesLived > 10 && isBehindBorder(vortexRemovalBorder)); // TODO zbadać różne ustawienia
+    return isBehindBorder(0) || (framesLived > 10 && isBehindBorder(vortexRemovalBorder));
 }
 
 bool Vortex::isBehindBorder(int border) {
