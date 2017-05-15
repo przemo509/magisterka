@@ -1,5 +1,7 @@
 #include "Config.h"
 
+const string Config::BOOL_TRUE_STRING = "true";
+
 Config *Config::instance;
 
 Config::Config(string configName) {
@@ -52,7 +54,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "vortexMoving") vortexMoving = atof(value.c_str());
         else if (key == "vortexRadiusMin") vortexRadiusMin = atof(value.c_str());
         else if (key == "vortexRadiusMax") vortexRadiusMax = atof(value.c_str());
-        else if (key == "useWaveletTurbulence") useWaveletTurbulence = "true" == value;
+        else if (key == "useWaveletTurbulence") useWaveletTurbulence = BOOL_TRUE_STRING == value;
         else if (key == "waveletTurbulenceAmplify") waveletTurbulenceAmplify = atoi(value.c_str());
         else if (key == "thermalBuoyancyFactor") thermalBuoyancyFactor = atof(value.c_str());
         else if (key == "gravityFactor") gravityFactor = atof(value.c_str());
@@ -72,6 +74,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "saveBigDensity") saveBigDensity = atoi(value.c_str());
         else if (key == "saveSmallFrames") saveSmallFrames = atoi(value.c_str());
         else if (key == "saveBigFrames") saveBigFrames = atoi(value.c_str());
+        else if (key == "zipRawFiles") zipRawFiles = BOOL_TRUE_STRING == value;
         else if (key == "threads") threads = atoi(value.c_str());
         else {
             Logger::getInstance()->error("Nieznany parametr konfiguracyjny: [%s = %s]", key.c_str(), value.c_str());

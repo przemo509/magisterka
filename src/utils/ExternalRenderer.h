@@ -34,6 +34,8 @@ private:
     int I3D(int i, int j, int k, int cubeSize);
 
     bool shouldRemove(int frame, int saveFrames);
+
+    void zipDensityFile(string basic_string);
 };
 
 

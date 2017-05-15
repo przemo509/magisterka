@@ -13,6 +13,7 @@ using namespace std;
 class Config {
 public:
     static const char numbersDelimiter = ';';
+    static const string BOOL_TRUE_STRING;
 
     int maxFrames;
     const int framesToSkipRender = 1; // ustawić na 1, żeby renderować wszystkie klatki
@@ -63,6 +64,7 @@ public:
     int saveBigDensity;
     int saveSmallFrames;
     int saveBigFrames;
+    bool zipRawFiles;
 
     int threads;
 
@@ -75,7 +77,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 33;
+    const int requiredMainConfigValues = 34;
 
     static Config *instance;
 

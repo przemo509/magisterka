@@ -1,6 +1,7 @@
 #include <cstring>
 #include "ExternalRenderer.h"
 #include "Config.h"
+
 /**
  * Obsługa wizualizacji w programie Blender.
  */
@@ -14,15 +15,21 @@ void ExternalRenderer::renderFrame(int frame) {
     int size = simulation->getArraysSize();
     dumpDensity(densityFilePath, simulation->getDensityArray(), size);
     runBlender(densityFilePath, "small", frame, size);
+    if (Config::getInstance()->zipRawFiles) {
+        zipDensityFile(densityFilePath);
+    }
     if (shouldRemove(frame, Config::getInstance()->saveSmallDensity)) {
         std::remove(densityFilePath.c_str());
     }
 
-    if(Config::getInstance()->useWaveletTurbulence) {
+    if (Config::getInstance()->useWaveletTurbulence) {
         densityFilePath = dataDirectoryWithPrefix + "_density_big_" + intToString(frame, 3, '0') + ".raw";
         size = simulation->waveletTurbulence->getResBig().x;
         dumpDensity(densityFilePath, simulation->waveletTurbulence->getDensityBig(), size);
         runBlender(densityFilePath, "big", frame, size);
+        if (Config::getInstance()->zipRawFiles) {
+            zipDensityFile(densityFilePath);
+        }
         if (shouldRemove(frame, Config::getInstance()->saveBigDensity)) {
             std::remove(densityFilePath.c_str());
         }
@@ -103,7 +110,7 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
 
 void ExternalRenderer::makeVideo(int frames) {
     makeVideo(frames, "small", Config::getInstance()->saveSmallFrames);
-    if(Config::getInstance()->useWaveletTurbulence) {
+    if (Config::getInstance()->useWaveletTurbulence) {
         makeVideo(frames, "big", Config::getInstance()->saveBigFrames);
     }
 }
@@ -150,5 +157,18 @@ bool ExternalRenderer::shouldRemove(int frame, int saveFrames) {
         return false; // zachowujemy wszystko
     } else {
         return frame % saveFrames != 0;
+    }
+}
+
+void ExternalRenderer::zipDensityFile(string filePath) {
+    string cmd = "zip -j " + dataDirectoryWithPrefix + "_all_raws.zip " + filePath;
+
+    int code = system(cmd.c_str());
+    if (code != 0) {
+        std::cout << cmd << endl;
+        Logger::getInstance()->error("Błąd komendy:\n%s", cmd.c_str());
+        exit(code);
+    } else {
+        Logger::getInstance()->info("Plik %s dołączony do archiwum", filePath.c_str());
     }
 }
