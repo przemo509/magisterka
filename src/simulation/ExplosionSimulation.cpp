@@ -43,7 +43,7 @@ ExplosionSimulation::ExplosionSimulation() {
     source = new FluidSource(Config::getInstance());
     vertices = new VerticesList(getArraysSize(), source);
 
-    if (Config::getInstance()->useWaveletTurbulence) {
+    if (Config::getInstance()->useWaveletTurbulence()) {
         waveletTurbulence = new WTURBULENCE(getArraysSize(), getArraysSize(), getArraysSize(), Config::getInstance()->waveletTurbulenceAmplify);
     } else {
         waveletTurbulence = NULL;

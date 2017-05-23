@@ -24,7 +24,6 @@ public:
     float vortexMoving;
     int vortexRadiusMin;
     int vortexRadiusMax;
-    bool useWaveletTurbulence;
     int waveletTurbulenceAmplify;
 
     const int simulationSpaceSize = 100;
@@ -76,8 +75,12 @@ public:
         instance = new Config(configName);
     }
 
+    bool useWaveletTurbulence() {
+        return waveletTurbulenceAmplify > 0;
+    }
+
 private:
-    const int requiredMainConfigValues = 34;
+    const int requiredMainConfigValues = 33;
 
     static Config *instance;
 

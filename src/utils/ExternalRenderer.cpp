@@ -22,7 +22,7 @@ void ExternalRenderer::renderFrame(int frame) {
         std::remove(densityFilePath.c_str());
     }
 
-    if (Config::getInstance()->useWaveletTurbulence) {
+    if (Config::getInstance()->useWaveletTurbulence()) {
         densityFilePath = dataDirectoryWithPrefix + "_density_big_" + intToString(frame, 3, '0') + ".raw";
         size = simulation->waveletTurbulence->getResBig().x;
         dumpDensity(densityFilePath, simulation->waveletTurbulence->getDensityBig(), size);
@@ -110,7 +110,7 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
 
 void ExternalRenderer::makeVideo(int frames) {
     makeVideo(frames, "small", Config::getInstance()->saveSmallFrames);
-    if (Config::getInstance()->useWaveletTurbulence) {
+    if (Config::getInstance()->useWaveletTurbulence()) {
         makeVideo(frames, "big", Config::getInstance()->saveBigFrames);
     }
 }

@@ -54,7 +54,6 @@ void Config::readConfig(bool isMain) {
         else if (key == "vortexMoving") vortexMoving = atof(value.c_str());
         else if (key == "vortexRadiusMin") vortexRadiusMin = atof(value.c_str());
         else if (key == "vortexRadiusMax") vortexRadiusMax = atof(value.c_str());
-        else if (key == "useWaveletTurbulence") useWaveletTurbulence = BOOL_TRUE_STRING == value;
         else if (key == "waveletTurbulenceAmplify") waveletTurbulenceAmplify = atoi(value.c_str());
         else if (key == "thermalBuoyancyFactor") thermalBuoyancyFactor = atof(value.c_str());
         else if (key == "gravityFactor") gravityFactor = atof(value.c_str());
