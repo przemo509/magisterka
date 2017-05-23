@@ -36,6 +36,8 @@ private:
     bool shouldRemove(int frame, int saveFrames);
 
     void zipDensityFile(string basic_string);
+
+    void renderFrame(int frame, string densityFilePrefix, int saveFrames, float *densityArray, int arraySize);
 };
 
 

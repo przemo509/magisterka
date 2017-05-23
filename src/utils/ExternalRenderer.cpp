@@ -1,6 +1,5 @@
 #include <cstring>
 #include "ExternalRenderer.h"
-#include "Config.h"
 
 /**
  * Obsługa wizualizacji w programie Blender.
@@ -11,28 +10,24 @@ ExternalRenderer::ExternalRenderer(ExplosionSimulation *simulation) {
 }
 
 void ExternalRenderer::renderFrame(int frame) {
-    string densityFilePath = dataDirectoryWithPrefix + "_density_small_" + intToString(frame, 3, '0') + ".raw";
-    int size = simulation->getArraysSize();
-    dumpDensity(densityFilePath, simulation->getDensityArray(), size);
-    runBlender(densityFilePath, "small", frame, size);
+    renderFrame(frame, "small", Config::getInstance()->saveSmallDensity,
+                simulation->getDensityArray(), simulation->getArraysSize());
+
+    if (Config::getInstance()->useWaveletTurbulence()) {
+        renderFrame(frame, "big", Config::getInstance()->saveBigDensity,
+                    simulation->waveletTurbulence->getDensityBig(), simulation->waveletTurbulence->getResBig().x);
+    }
+}
+
+void ExternalRenderer::renderFrame(int frame, string densityFilePrefix, int saveFrames, float *densityArray, int arraySize) {
+    string densityFilePath = dataDirectoryWithPrefix + "_density_" + densityFilePrefix + "_" + intToString(frame, 3, '0') + ".raw";
+    dumpDensity(densityFilePath, densityArray, arraySize);
+    runBlender(densityFilePath, densityFilePrefix, frame, arraySize);
     if (Config::getInstance()->zipRawFiles) {
         zipDensityFile(densityFilePath);
     }
-    if (shouldRemove(frame, Config::getInstance()->saveSmallDensity)) {
+    if (shouldRemove(frame, saveFrames)) {
         std::remove(densityFilePath.c_str());
-    }
-
-    if (Config::getInstance()->useWaveletTurbulence()) {
-        densityFilePath = dataDirectoryWithPrefix + "_density_big_" + intToString(frame, 3, '0') + ".raw";
-        size = simulation->waveletTurbulence->getResBig().x;
-        dumpDensity(densityFilePath, simulation->waveletTurbulence->getDensityBig(), size);
-        runBlender(densityFilePath, "big", frame, size);
-        if (Config::getInstance()->zipRawFiles) {
-            zipDensityFile(densityFilePath);
-        }
-        if (shouldRemove(frame, Config::getInstance()->saveBigDensity)) {
-            std::remove(densityFilePath.c_str());
-        }
     }
 }
 
