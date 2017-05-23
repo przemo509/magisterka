@@ -23,10 +23,10 @@ void ExternalRenderer::renderFrame(int frame, string densityFilePrefix, int save
     string densityFilePath = dataDirectoryWithPrefix + "_density_" + densityFilePrefix + "_" + intToString(frame, 3, '0') + ".raw";
     dumpDensity(densityFilePath, densityArray, arraySize);
     runBlender(densityFilePath, densityFilePrefix, frame, arraySize);
-    if (Config::getInstance()->zipRawFiles) {
-        zipDensityFile(densityFilePath);
-    }
     if (shouldRemove(frame, saveFrames)) {
+        std::remove(densityFilePath.c_str());
+    } else if (Config::getInstance()->zipRawFiles) {
+        zipDensityFile(densityFilePath);
         std::remove(densityFilePath.c_str());
     }
 }
