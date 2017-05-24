@@ -84,6 +84,9 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
                         " " + intToString(size) +
                         " " + intToString(size) +
                         " " + intToString(size) +
+                        " " + intToString(config->imgResX) +
+                        " " + intToString(config->imgResY) +
+                        " " + intToString(config->imgResPercentage) +
                         " " + floatToString(config->rayTracingStepSize) +
                         " " + intToString(config->threads) +
                         " " + (frame == 1 ? config->mainConfigFilePath : config->configFilePath) +

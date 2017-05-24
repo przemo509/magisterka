@@ -68,6 +68,9 @@ void Config::readConfig(bool isMain) {
         else if (key == "sourceVelocitiesValues") sourceVelocitiesValuesString = value;
         else if (key == "sourcePhaseFrames") sourcePhaseFramesString = value;
         else if (key == "sourcePhaseVelocitiesIdxs") sourcePhaseVelocitiesIdxsString = value;
+        else if (key == "imgResX") imgResX = atoi(value.c_str());
+        else if (key == "imgResY") imgResY = atoi(value.c_str());
+        else if (key == "imgResPercentage") imgResPercentage = atoi(value.c_str());
         else if (key == "rayTracingStepSize") rayTracingStepSize = atof(value.c_str());
         else if (key == "saveSmallDensity") saveSmallDensity = atoi(value.c_str());
         else if (key == "saveBigDensity") saveBigDensity = atoi(value.c_str());

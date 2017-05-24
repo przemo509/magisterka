@@ -1,4 +1,4 @@
-import bpy
+import bpy  # biblioteki Blendera
 import sys
 
 argv = sys.argv
@@ -9,21 +9,29 @@ argv = argv[argv.index("--") + 1:]  # get all args after "--"
 print("=====> My args:")
 print(argv)
 
+# Przepisanie parametrów do zmiennych o znaczących nazwach:
 densityFilePath = argv[0]
-xRes = int(argv[1])
-yRes = int(argv[2])
-zRes = int(argv[3])
-rayTracingStepSize = float(argv[4])
-threads = int(argv[5])
-configFilePath = argv[6]
-additionalTextsToDisplay = argv[7:]
+densResX = int(argv[1])
+densResY = int(argv[2])
+densResZ = int(argv[3])
+imgResX = int(argv[4])
+imgResY = int(argv[5])
+imgResPercentage = int(argv[6])
+rayTracingStepSize = float(argv[7])
+threads = int(argv[8])
+configFilePath = argv[9]
+additionalTextsToDisplay = argv[10:]
 
 bpy.context.scene.objects.active = bpy.data.objects['domain']
 bpy.data.textures["Tex"].voxel_data.filepath = densityFilePath
-bpy.data.textures["Tex"].voxel_data.resolution[0] = xRes
-bpy.data.textures["Tex"].voxel_data.resolution[1] = yRes
-bpy.data.textures["Tex"].voxel_data.resolution[2] = zRes
+bpy.data.textures["Tex"].voxel_data.resolution[0] = densResX
+bpy.data.textures["Tex"].voxel_data.resolution[1] = densResY
+bpy.data.textures["Tex"].voxel_data.resolution[2] = densResZ
 bpy.context.scene.objects.active.active_material.volume.step_size = rayTracingStepSize
+
+bpy.context.scene.render.resolution_x = imgResX
+bpy.context.scene.render.resolution_y = imgResY
+bpy.context.scene.render.resolution_percentage = imgResPercentage
 
 bpy.context.scene.render.threads = threads
 
