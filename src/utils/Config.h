@@ -50,6 +50,7 @@ public:
     int imgResY;
     int imgResPercentage;
     float rayTracingStepSize;
+    int ffmpegCRF;
 
     const string mainConfigFilePath = "./config.txt";
     string configName;
@@ -83,7 +84,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 36;
+    const int requiredMainConfigValues = 37;
 
     static Config *instance;
 

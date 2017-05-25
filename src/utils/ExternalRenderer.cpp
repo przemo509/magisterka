@@ -120,7 +120,7 @@ void ExternalRenderer::makeVideo(int frames, string outputFilePrefix, int saveFr
                  " -loglevel panic" +
                  " -i " + dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_%03d.png" +
                  " -c:v libx264" +
-                 " -crf 0" +
+                 " -crf " + intToString(Config::getInstance()->ffmpegCRF) +
                  " -pix_fmt yuv420p" +
                  " \"" + outputVideoFilePath + "\"";
 

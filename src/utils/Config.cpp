@@ -72,6 +72,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "imgResY") imgResY = atoi(value.c_str());
         else if (key == "imgResPercentage") imgResPercentage = atoi(value.c_str());
         else if (key == "rayTracingStepSize") rayTracingStepSize = atof(value.c_str());
+        else if (key == "ffmpegCRF") ffmpegCRF = atoi(value.c_str());
         else if (key == "saveSmallDensity") saveSmallDensity = atoi(value.c_str());
         else if (key == "saveBigDensity") saveBigDensity = atoi(value.c_str());
         else if (key == "saveSmallFrames") saveSmallFrames = atoi(value.c_str());
