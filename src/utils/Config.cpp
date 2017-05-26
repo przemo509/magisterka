@@ -64,7 +64,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "sourceRadius") sourceRadius = atoi(value.c_str());
         else if (key == "sourceHeight") sourceHeight = atoi(value.c_str());
         else if (key == "sourceSpreadFactor") sourceSpreadFactor = atof(value.c_str());
-        else if (key == "sourceDensity") sourceDensity = atof(value.c_str());
+        else if (key == "sourceDensityFactor") sourceDensityFactor = atof(value.c_str());
         else if (key == "sourceVelocitiesValues") sourceVelocitiesValuesString = value;
         else if (key == "sourcePhaseFrames") sourcePhaseFramesString = value;
         else if (key == "sourcePhaseVelocitiesIdxs") sourcePhaseVelocitiesIdxsString = value;

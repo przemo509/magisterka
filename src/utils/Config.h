@@ -39,7 +39,7 @@ public:
     int sourceRadius;
     int sourceHeight;
     float sourceSpreadFactor;
-    float sourceDensity;
+    float sourceDensityFactor;
     string sourceVelocitiesValuesString;
     string sourcePhaseFramesString;
     string sourcePhaseVelocitiesIdxsString;

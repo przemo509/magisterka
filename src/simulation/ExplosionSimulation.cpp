@@ -125,7 +125,7 @@ void ExplosionSimulation::addSources() {
         for (int j = startY; j < endY; ++j) {
             for (int i = startX; i < endX; ++i) {
                 int di = i - source->positionX;
-                double dd = dt / (sqrt(di * di + dk * dk) + 0.01) * source->density;
+                double dd = dt / (sqrt(di * di + dk * dk) + 0.01) * source->densityFactor * dvy;
                 double dvx = dt * sin(di) * source->spreadFactor;  // na zewnątrz
                 int idx3D = I3D(i, j, k, cubeSize);
                 dens[idx3D] += dd;
@@ -133,7 +133,7 @@ void ExplosionSimulation::addSources() {
                 vz[idx3D] += dvz;
                 vy[idx3D] += dvy;
 
-                if(waveletTurbulence) {
+                if (waveletTurbulence) {
                     int amplify = Config::getInstance()->waveletTurbulenceAmplify;
                     for (int wk = k * amplify; wk < (k + 1) * amplify; wk++) {
                         for (int wj = j * amplify; wj < (j + 1) * amplify; wj++) {

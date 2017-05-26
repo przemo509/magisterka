@@ -19,7 +19,7 @@ public:
     int radius;
     float spreadFactor;
 
-    float density;
+    float densityFactor;
 
     int getStartX();
 

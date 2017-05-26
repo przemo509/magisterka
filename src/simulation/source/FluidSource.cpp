@@ -8,7 +8,7 @@ FluidSource::FluidSource(Config *config) {
     positionZ = atoi(sourcePositionStrings[2].c_str());
     radius = config->sourceRadius;
     height = config->sourceHeight;
-    density = config->sourceDensity;
+    densityFactor = config->sourceDensityFactor;
     spreadFactor = config->sourceSpreadFactor;
 
     vector<float> velocitiesValues = parseVelocities(config->sourceVelocitiesValuesString);
