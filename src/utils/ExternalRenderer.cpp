@@ -168,6 +168,6 @@ void ExternalRenderer::zipDensityFile(string filePath) {
         Logger::getInstance()->error("Błąd komendy:\n%s", cmd.c_str());
         exit(code);
     } else {
-        Logger::getInstance()->info("Plik %s dołączony do archiwum", filePath.c_str());
+        Logger::getInstance()->debug2("Plik %s dołączony do archiwum", filePath.c_str());
     }
 }
