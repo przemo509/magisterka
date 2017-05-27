@@ -62,6 +62,7 @@ WTURBULENCE::WTURBULENCE(int xResSm, int yResSm, int zResSm, int amplify) {
     _invResBig = Vec3(1. / (float) _resBig[0], 1. / (float) _resBig[1], 1. / (float) _resBig[2]);
     _slabSizeBig = _xResBig * _yResBig;
     _totalCellsBig = _slabSizeBig * _zResBig;
+    int totalCellsBig = Config::getInstance()->renderExistingDumps ? 0 : _totalCellsBig;
 
     // original / small resolution
     _xResSm = xResSm;
@@ -74,20 +75,20 @@ WTURBULENCE::WTURBULENCE(int xResSm, int yResSm, int zResSm, int amplify) {
 
     // allocate high resolution density field
     _totalStepsBig = 0;
-    _densityBig = new float[_totalCellsBig];
-    _densityBigOld = new float[_totalCellsBig];
+    _densityBig = new float[totalCellsBig];
+    _densityBigOld = new float[totalCellsBig];
 
     // allocate high resolution velocity field. Note that this is only
     // necessary because we use MacCormack advection. For semi-Lagrangian
     // advection, these arrays are not necessary.
     _tempBig1 = _tempBig2 =
     _bigUx = _bigUy = _bigUz = NULL;
-    _tempBig1 = new float[_totalCellsBig];
-    _tempBig2 = new float[_totalCellsBig];
-    _bigUx = new float[_totalCellsBig];
-    _bigUy = new float[_totalCellsBig];
-    _bigUz = new float[_totalCellsBig];
-    for (int i = 0; i < _totalCellsBig; i++) {
+    _tempBig1 = new float[totalCellsBig];
+    _tempBig2 = new float[totalCellsBig];
+    _bigUx = new float[totalCellsBig];
+    _bigUy = new float[totalCellsBig];
+    _bigUz = new float[totalCellsBig];
+    for (int i = 0; i < totalCellsBig; i++) {
         _densityBig[i] =
         _densityBigOld[i] =
         _bigUx[i] =
