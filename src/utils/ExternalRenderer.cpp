@@ -19,7 +19,7 @@ void ExternalRenderer::renderFrame(int frame) {
 }
 
 void ExternalRenderer::renderFrame(int frame, string densityFilePrefix, int saveFrames, float *densityArray, int arraySize) {
-    string densityFilePath = config->dataDirectoryWithPrefix + "_density_" + densityFilePrefix + "_" + intToString(frame, 4, '0') + ".raw";
+    string densityFilePath = config->dataDirectoryWithPrefix + "_density_" + densityFilePrefix + "_" + intToString(frame, 3, '0') + ".raw";
     if (!config->renderExistingDumps) {
         dumpDensity(densityFilePath, densityArray, arraySize);
     }
@@ -79,7 +79,7 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
                         " --background" +
                         " " + config->blenderScenePath +
                         " --python " + config->pythonScriptPath +
-                        " --render-output " + config->dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_####.png" +
+                        " --render-output " + config->dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_###.png" +
                         " --render-frame " + intToString(frame) +
                         " --" +
                         " " + densityFilePath +
@@ -125,7 +125,7 @@ void ExternalRenderer::makeVideo(int frames, string outputFilePrefix, int saveFr
     string cmd = config->ffmpegExecutablePath +
                  " -y" +
                  " -loglevel panic" +
-                 " -i " + imagesSequencePrefix + "_%04d.png" +
+                 " -i " + imagesSequencePrefix + "_%03d.png" +
                  " -c:v libx264" +
                  " -crf " + intToString(config->ffmpegCRF) +
                  " -pix_fmt yuv420p" +
@@ -153,7 +153,7 @@ bool ExternalRenderer::needToMakeContinuousSequence() const {
 void ExternalRenderer::removeRenderedFrames(int frames, string imageSequencePrefix, int saveFrames) {
     for (int frame = 1; frame <= frames; frame++) {
         if (shouldRemove(frame, saveFrames)) {
-            string frameFilePath = imageSequencePrefix + "_" + intToString(frame, 4, '0') + ".png";
+            string frameFilePath = imageSequencePrefix + "_" + intToString(frame, 3, '0') + ".png";
             std::remove(frameFilePath.c_str());
         }
     }
@@ -185,8 +185,8 @@ string ExternalRenderer::copyFramesContinuously(int frames, string imageSequence
 
     int image = 1;
     for (int frame = 1; frame <= frames; frame++) {
-        string fileToCopyPath = imageSequencePrefix + "_" + intToString(frame, 4, '0') + ".png";
-        string newFilePath = imageSequencePrefixNew + "_" + intToString(image, 4, '0') + ".png";
+        string fileToCopyPath = imageSequencePrefix + "_" + intToString(frame, 3, '0') + ".png";
+        string newFilePath = imageSequencePrefixNew + "_" + intToString(image, 3, '0') + ".png";
         std::ifstream fileToCopy(fileToCopyPath, std::ios::binary);
         if (fileToCopy.good()) { // plik istnieje
             std::ofstream newFile(newFilePath, std::ios::binary);
@@ -203,7 +203,7 @@ string ExternalRenderer::copyFramesContinuously(int frames, string imageSequence
 
 void ExternalRenderer::removeContinuousCopies(int images, string imagesSequencePrefix) {
     for (int image = 1; image <= images; image++) {
-        string frameFilePath = imagesSequencePrefix + "_" + intToString(image, 4, '0') + ".png";
+        string frameFilePath = imagesSequencePrefix + "_" + intToString(image, 3, '0') + ".png";
         std::remove(frameFilePath.c_str());
     }
 }

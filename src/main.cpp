@@ -26,7 +26,7 @@ void logFrameProcessingTime(int currentFrame, long frameStartTime, long programS
     struct tm *now = localtime(&currentTime);
 
     Logger::getInstance()->info("Klatka %s z %d (%s%%) wygenerowana w %s s. Koniec za: %s, czyli o: %s",
-                                intToString(currentFrame, 4, ' ').c_str(),
+                                intToString(currentFrame, 3, ' ').c_str(),
                                 Config::getInstance()->maxFrames,
                                 intToString((int) percent, 3, ' ').c_str(),
                                 intToString((int) (currentTime - frameStartTime), 3, ' ').c_str(),
