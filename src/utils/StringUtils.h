@@ -10,6 +10,12 @@
 
 using namespace std;
 
+static const int secInMin = 60;
+static const int minInHour = 60;
+static const int hourInDay = 24;
+static const int secInHour = secInMin * minInHour;
+static const int secInDay = secInHour * hourInDay;
+
 static vector<string> &split(const string &s, char delim, vector<string> &elems) {
     stringstream ss(s);
     string item;
@@ -59,10 +65,11 @@ static inline string intToString(int i, int width, char padding) {
 }
 
 static string formatTime(int seconds) {
-    int h = seconds / 3600;
-    int m = (seconds % 3600) / 60;
-    int s = seconds % 60;
-    return intToString(h, 2, '0') + ":" + intToString(m, 2, '0') + ":" + intToString(s, 2, '0');
+    int d = seconds / secInDay;
+    int h = (seconds % secInDay) / secInHour;
+    int m = (seconds % secInHour) / secInMin;
+    int s = seconds % secInMin;
+    return (d > 0 ? intToString(d) + "d " : "") + intToString(h, 2, '0') + ":" + intToString(m, 2, '0') + ":" + intToString(s, 2, '0');
 }
 
 #endif //MAGISTERKA_STRINGUTILS_H
