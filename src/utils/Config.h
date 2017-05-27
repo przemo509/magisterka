@@ -16,7 +16,6 @@ public:
     static const string BOOL_TRUE_STRING;
 
     int maxFrames;
-    const int framesToSkipRender = 1; // ustawić na 1, żeby renderować wszystkie klatki
 
     const bool simulateVertices = true;
     float verticesCountFactor;
@@ -47,6 +46,8 @@ public:
 
     const int relaxationSteps = 12; // liczba iteracji relaksacji Gaussa-Seidela
 
+    int renderStartsAtFrame;
+    int renderFrames;
     int imgResX;
     int imgResY;
     int imgResPercentage;
@@ -87,7 +88,7 @@ public:
     static bool featureEnabledAtFrame(int frame, int enabledFrames, int startingFrame);
 
 private:
-    const int requiredMainConfigValues = 38;
+    const int requiredMainConfigValues = 40;
 
     static Config *instance;
 

@@ -38,6 +38,12 @@ private:
     void zipDensityFile(string basic_string);
 
     void renderFrame(int frame, string densityFilePrefix, int saveFrames, float *densityArray, int arraySize);
+
+    bool needToMakeContinuousSequence() const;
+
+    string copyFramesContinuously(int frames, string imageSequencePrefix);
+
+    void removeContinuousCopies(int images, string imagesSequencePrefix);
 };
 
 
