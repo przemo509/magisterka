@@ -34,6 +34,7 @@ public:
     float thermalBuoyancyFactor;
     float gravityFactor;
     float windFactor;
+    bool solidVolumeBoundaries;
 
     string sourcePositionString;
     int sourceRadius;
@@ -84,7 +85,7 @@ public:
     }
 
 private:
-    const int requiredMainConfigValues = 37;
+    const int requiredMainConfigValues = 38;
 
     static Config *instance;
 

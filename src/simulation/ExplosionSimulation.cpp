@@ -246,13 +246,22 @@ void ExplosionSimulation::diffuse(BoundDirection dir, float factor, float *x, fl
 }
 
 /**
- * Wymuszenie warunków brzegowych, czyli ustawienie na brzegu domeny takich samych wartości pól jak w warstwie o jedną komórkę głębiej.
+ * Wymuszenie warunków brzegowych w zależności od parametru konfiguracyjnego "solidVolumeBoundaries":
+ *  - efekt zamkniętego "akwarium" (zmiana zwrotu prędkości prostopadłych do ścian na przeciwny)
+ *  - efekt otwartego wolumenu, z którego płyn wydostaje się na zewnątrz (zerowanie gęstości, a prędkości bez zmian)
  */
 void ExplosionSimulation::setBoundaries(BoundDirection dir, float *x, int N) {
     int cubeSize = N + 2;
-    int xSign = dir == X_DIR ? -1 : 1;
-    int ySign = dir == Y_DIR ? -1 : 1;
-    int zSign = dir == Z_DIR ? -1 : 1;
+    int xSign, ySign, zSign;
+    if (Config::getInstance()->solidVolumeBoundaries) {
+        xSign = dir == X_DIR ? -1 : 1;
+        ySign = dir == Y_DIR ? -1 : 1;
+        zSign = dir == Z_DIR ? -1 : 1;
+    } else {
+        xSign = dir == NO_DIR ? 0 : 1;
+        ySign = dir == NO_DIR ? 0 : 1;
+        zSign = dir == NO_DIR ? 0 : 1;
+    }
 
     // ściany (6)
     for (int i = 1; i <= N; ++i) {

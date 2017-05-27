@@ -60,6 +60,7 @@ void Config::readConfig(bool isMain) {
         else if (key == "windFactor") windFactor = atof(value.c_str());
         else if (key == "viscosity") viscosity = atof(value.c_str());
         else if (key == "diffusionRate") diffusionRate = atof(value.c_str());
+        else if (key == "solidVolumeBoundaries") solidVolumeBoundaries = BOOL_TRUE_STRING == value;
         else if (key == "sourcePosition") sourcePositionString = value.c_str();
         else if (key == "sourceRadius") sourceRadius = atoi(value.c_str());
         else if (key == "sourceHeight") sourceHeight = atoi(value.c_str());
