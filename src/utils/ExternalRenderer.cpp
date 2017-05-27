@@ -5,27 +5,26 @@
  * Obsługa wizualizacji w programie Blender.
  */
 ExternalRenderer::ExternalRenderer(ExplosionSimulation *simulation) {
-    dataDirectoryWithPrefix = Config::getInstance()->dataDirectoryWithPrefix;
+    this->config = Config::getInstance();
     this->simulation = simulation;
 }
 
 void ExternalRenderer::renderFrame(int frame) {
-    renderFrame(frame, "small", Config::getInstance()->saveSmallDensity,
-                simulation->getDensityArray(), simulation->getArraysSize());
+    renderFrame(frame, "small", config->saveSmallDensity, simulation->getDensityArray(), simulation->getArraysSize());
 
-    if (Config::getInstance()->useWaveletTurbulence()) {
-        renderFrame(frame, "big", Config::getInstance()->saveBigDensity,
-                    simulation->waveletTurbulence->getDensityBig(), simulation->waveletTurbulence->getResBig().x);
+    if (config->useWaveletTurbulence()) {
+        WTURBULENCE *wt = simulation->waveletTurbulence;
+        renderFrame(frame, "big", config->saveBigDensity, wt->getDensityBig(), wt->getResBig().x);
     }
 }
 
 void ExternalRenderer::renderFrame(int frame, string densityFilePrefix, int saveFrames, float *densityArray, int arraySize) {
-    string densityFilePath = dataDirectoryWithPrefix + "_density_" + densityFilePrefix + "_" + intToString(frame, 3, '0') + ".raw";
+    string densityFilePath = config->dataDirectoryWithPrefix + "_density_" + densityFilePrefix + "_" + intToString(frame, 3, '0') + ".raw";
     dumpDensity(densityFilePath, densityArray, arraySize);
     runBlender(densityFilePath, densityFilePrefix, frame, arraySize);
     if (shouldRemove(frame, saveFrames)) {
         std::remove(densityFilePath.c_str());
-    } else if (Config::getInstance()->zipRawFiles) {
+    } else if (config->zipRawFiles) {
         zipDensityFile(densityFilePath);
         std::remove(densityFilePath.c_str());
     }
@@ -72,12 +71,11 @@ BYTE *ExternalRenderer::composeOutArray(float *density, int size) {
 }
 
 void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefix, int frame, int size) {
-    Config *config = Config::getInstance();
     string blenderCmd = config->blenderExecutablePath +
                         " --background" +
                         " " + config->blenderScenePath +
                         " --python " + config->pythonScriptPath +
-                        " --render-output " + dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_###.png" +
+                        " --render-output " + config->dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_###.png" +
                         " --render-frame " + intToString(frame) +
                         " --" +
                         " " + densityFilePath +
@@ -94,7 +92,7 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
                         " \"verticesActive  = " + intToString(simulation->vertices->getCurrentCount(), 6, '0') + "\"" +
                         " \"verticesTotal   = " + intToString(simulation->vertices->getCreatedCount(), 6, '0') + "\"" +
                         " \"verticesRemoved = " + intToString(simulation->vertices->getDeletedCount(), 6, '0') + "\"" +
-                        " > " + dataDirectoryWithPrefix + "_blender_" + outputFilePrefix + "_log.txt 2>&1";
+                        " > " + config->dataDirectoryWithPrefix + "_blender_" + outputFilePrefix + "_log.txt 2>&1";
 
     int code = system(blenderCmd.c_str());
     if (code != 0) {
@@ -107,20 +105,20 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
 }
 
 void ExternalRenderer::makeVideo(int frames) {
-    makeVideo(frames, "small", Config::getInstance()->saveSmallFrames);
-    if (Config::getInstance()->useWaveletTurbulence()) {
-        makeVideo(frames, "big", Config::getInstance()->saveBigFrames);
+    makeVideo(frames, "small", config->saveSmallFrames);
+    if (config->useWaveletTurbulence()) {
+        makeVideo(frames, "big", config->saveBigFrames);
     }
 }
 
 void ExternalRenderer::makeVideo(int frames, string outputFilePrefix, int saveFrames) {
-    string outputVideoFilePath = dataDirectoryWithPrefix + " - " + Config::getInstance()->configDescription + "_" + outputFilePrefix + ".mp4";
-    string cmd = Config::getInstance()->ffmpegExecutablePath +
+    string outputVideoFilePath = config->dataDirectoryWithPrefix + " - " + config->configDescription + "_" + outputFilePrefix + ".mp4";
+    string cmd = config->ffmpegExecutablePath +
                  " -y" +
                  " -loglevel panic" +
-                 " -i " + dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_%03d.png" +
+                 " -i " + config->dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_%03d.png" +
                  " -c:v libx264" +
-                 " -crf " + intToString(Config::getInstance()->ffmpegCRF) +
+                 " -crf " + intToString(config->ffmpegCRF) +
                  " -pix_fmt yuv420p" +
                  " \"" + outputVideoFilePath + "\"";
 
@@ -139,7 +137,7 @@ void ExternalRenderer::makeVideo(int frames, string outputFilePrefix, int saveFr
 void ExternalRenderer::removeRenderedFrames(int frames, string outputFilePrefix, int saveFrames) {
     for (int frame = 1; frame <= frames; frame++) {
         if (shouldRemove(frame, saveFrames)) {
-            string frameFilePath = dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_" + intToString(frame, 3, '0') + ".png";
+            string frameFilePath = config->dataDirectoryWithPrefix + "_blender_render_" + outputFilePrefix + "_" + intToString(frame, 3, '0') + ".png";
             std::remove(frameFilePath.c_str());
         }
     }
@@ -150,17 +148,11 @@ int ExternalRenderer::I3D(int i, int j, int k, int cubeSize) {
 }
 
 bool ExternalRenderer::shouldRemove(int frame, int saveFrames) {
-    if (saveFrames == 0) {
-        return true; // usuwamy wszystko
-    } else if (saveFrames == 1) {
-        return false; // zachowujemy wszystko
-    } else {
-        return frame % saveFrames != 0;
-    }
+    return !Config::featureEnabledAtFrame(frame, saveFrames, 1);
 }
 
 void ExternalRenderer::zipDensityFile(string filePath) {
-    string cmd = "zip -j " + dataDirectoryWithPrefix + "_all_raws.zip " + filePath;
+    string cmd = "zip -j " + config->dataDirectoryWithPrefix + "_all_raws.zip " + filePath;
 
     int code = system(cmd.c_str());
     if (code != 0) {

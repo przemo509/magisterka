@@ -84,6 +84,8 @@ public:
         return waveletTurbulenceAmplify > 0;
     }
 
+    static bool featureEnabledAtFrame(int frame, int enabledFrames, int startingFrame);
+
 private:
     const int requiredMainConfigValues = 38;
 

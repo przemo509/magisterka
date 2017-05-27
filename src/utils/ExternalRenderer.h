@@ -18,7 +18,7 @@ public:
     void makeVideo(int frames);
 
 private:
-    string dataDirectoryWithPrefix;
+    Config *config;
     ExplosionSimulation *simulation;
 
     void dumpDensity(string filePath, float *density, int size);

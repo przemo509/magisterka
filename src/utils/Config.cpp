@@ -97,3 +97,19 @@ void Config::readConfig(bool isMain) {
     file.close();
     Logger::getInstance()->info("Poprawnie odczytano plik konfiguracyjny: [%s]", filePath.c_str());
 }
+
+/**
+ * Funkcja pomocnicza służąca do sprawdzenia czy dana funkcja jest dostępna w danej klatce.
+ * Na przykład można dzięki niej usunąć wynikowe pliki pośrednie lub przeprowadzić wizualizację tylko dla wybranych klatek zaczynając od podanej klatki.
+ */
+bool Config::featureEnabledAtFrame(int frame, int enabledFrames, int startingFrame) {
+    if (enabledFrames == 0) {
+        return false; // funkcja wyłączona
+    } else if (frame < startingFrame) {
+        return false; // funkcja wyłączona przed klatką rozpoczynającą
+    } else if (enabledFrames == 1) {
+        return true; // funkcja włączona dla każdej klatki po klatce rozpoczynającej
+    } else {
+        return frame % enabledFrames == 0; // funkcja włączona dla co n-tej klatki
+    }
+}
