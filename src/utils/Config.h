@@ -48,6 +48,7 @@ public:
 
     int renderStartsAtFrame;
     int renderFrames;
+    bool renderExistingDumps;
     int imgResX;
     int imgResY;
     int imgResPercentage;
@@ -88,7 +89,7 @@ public:
     static bool featureEnabledAtFrame(int frame, int enabledFrames, int startingFrame);
 
 private:
-    const int requiredMainConfigValues = 40;
+    const int requiredMainConfigValues = 41;
 
     static Config *instance;
 

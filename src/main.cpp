@@ -75,7 +75,9 @@ int main(int argc, char **argv) {
         frameStartTime = Timer::getInstance().getCurrentTime();
 
         // Krok symulacji + wizualizacja.
-        simulation->proceed();
+        if (!Config::getInstance()->renderExistingDumps) {
+            simulation->proceed();
+        }
         renderer->renderFrame(currentFrame);
         logFrameProcessingTime(currentFrame, frameStartTime, programStartTime);
     }
