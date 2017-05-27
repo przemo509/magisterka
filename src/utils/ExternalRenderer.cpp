@@ -20,7 +20,9 @@ void ExternalRenderer::renderFrame(int frame) {
 
 void ExternalRenderer::renderFrame(int frame, string densityFilePrefix, int saveFrames, float *densityArray, int arraySize) {
     string densityFilePath = config->dataDirectoryWithPrefix + "_density_" + densityFilePrefix + "_" + intToString(frame, 4, '0') + ".raw";
-    dumpDensity(densityFilePath, densityArray, arraySize);
+    if (!config->renderExistingDumps) {
+        dumpDensity(densityFilePath, densityArray, arraySize);
+    }
     if (Config::featureEnabledAtFrame(frame, config->renderFrames, config->renderStartsAtFrame)) {
         runBlender(densityFilePath, densityFilePrefix, frame, arraySize);
     }
