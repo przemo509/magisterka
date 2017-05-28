@@ -109,9 +109,11 @@ void ExternalRenderer::runBlender(string densityFilePath, string outputFilePrefi
 }
 
 void ExternalRenderer::makeVideo(int frames) {
-    makeVideo(frames, "small", config->saveSmallFrames);
-    if (config->useWaveletTurbulence()) {
-        makeVideo(frames, "big", config->saveBigFrames);
+    if (config->renderFrames > 0 || config->renderExistingDumps) {
+        makeVideo(frames, "small", config->saveSmallFrames);
+        if (config->useWaveletTurbulence()) {
+            makeVideo(frames, "big", config->saveBigFrames);
+        }
     }
 }
 
